@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prospector — Sports Car Racing Audience Atlas</title>
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg-page: #f8f7f3;
+    --bg-surface: #ffffff;
+    --bg-secondary: #f1f0ea;
+    --bg-tertiary: #e7e6df;
+    --text-primary: #18181a;
+    --text-secondary: #6a6a64;
+    --text-tertiary: #9c9b92;
+    --border-tertiary: rgba(0, 0, 0, 0.08);
+    --border-secondary: rgba(0, 0, 0, 0.18);
+    --accent-info: #185fa5;
+    --accent-info-bg: #e6f1fb;
+    --accent-warn-bg: #faeeda;
+    --accent-warn: #854f0b;
+    --accent-success: #3b6d11;
+    --accent-success-bg: #eaf3de;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --c-imsa:   #c63b3b;
+    --c-f1:     #e88318;
+    --c-nascar: #6f4ba0;
+    --c-indy:   #1d8060;
+    --c-wec:    #2563a8;
+    --c-rally:  #8a4f23;
+    --c-watch:  #b6841c;
+    --c-golf:   #4f8a37;
+    --c-aviation: #4a73a3;
+    --c-spirits: #8b3a3a;
+    --c-track:  #555;
+    --c-male:   #2a5a8a;
+    --c-female: #b85785;
+    --c-age:    #185fa5;
+    --c-life:   #6b4f9b;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 28px 32px 80px;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 0.5px solid var(--border-tertiary);
+    margin-bottom: 24px;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-mark {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bg-page);
+    font-weight: 500; font-size: 14px;
+    letter-spacing: -0.02em;
+  }
+  .brand-text { line-height: 1.2; }
+  .brand-text .crumb {
+    font-size: 12px;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+  }
+  .brand-text .title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .topbar-meta { display: flex; align-items: center; gap: 12px; }
+  .pill {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--accent-info-bg);
+    color: var(--accent-info);
+    font-weight: 500;
+  }
+  .pill-muted { font-size: 12px; color: var(--text-tertiary); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 32px;
+  }
+  nav { position: sticky; top: 24px; height: fit-content; }
+  nav ul { list-style: none; padding: 0; margin: 0; }
+  nav li { margin-bottom: 2px; }
+  nav a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.1s ease, color 0.1s ease;
+  }
+  nav a:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  nav a.active { background: var(--text-primary); color: var(--bg-page); }
+  nav .nav-section {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 12px 12px 6px;
+    margin-top: 8px;
+  }
+
+  /* Honest framing banner */
+  .demo-banner {
+    background: var(--accent-warn-bg);
+    color: var(--accent-warn);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    font-size: 12px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    line-height: 1.5;
+  }
+  .demo-banner-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-warn);
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Filters */
+  .filters {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 0.7fr;
+    gap: 12px;
+    margin-bottom: 26px;
+    align-items: end;
+  }
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .field select {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    background: var(--bg-surface);
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text-primary);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 10px;
+  }
+  .field select:hover { border-color: rgba(0, 0, 0, 0.3); }
+  .field select:focus {
+    outline: none;
+    border-color: var(--accent-info);
+    box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.1);
+  }
+  button.primary {
+    height: 38px;
+    padding: 0 20px;
+    background: var(--text-primary);
+    color: var(--bg-page);
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.1s ease;
+  }
+  button.primary:hover { opacity: 0.85; }
+  button.primary:active { transform: scale(0.98); }
+
+  /* Hero strip */
+  .hero-strip {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.4fr;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .hero-cell {
+    background: var(--bg-surface);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+  }
+  .hero-cell .label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .hero-cell .value {
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    transition: color 0.2s ease;
+  }
+  .hero-cell .value.flash { color: var(--accent-info); }
+  .hero-cell .delta {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 6px;
+  }
+  .platform-mini {
+    display: flex;
+    gap: 4px;
+    margin-top: 10px;
+    height: 18px;
+  }
+  .platform-seg {
+    flex: 1;
+    border-radius: 3px;
+    background: var(--bg-tertiary);
+    position: relative;
+  }
+  .platform-seg.active { background: var(--text-primary); }
+  .platform-seg .pseg-label {
+    position: absolute; bottom: -16px; left: 0; font-size: 10px; color: var(--text-tertiary);
+  }
+
+  /* Standard panel */
+  .panel {
+    background: var(--bg-surface);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+  }
+  .panel h3 {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0 0 4px;
+  }
+  .panel .panel-sub {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .panel .footnote {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 14px;
+    line-height: 1.5;
+  }
+
+  .panel-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+
+  /* Demographic panel — tabbed */
+  .demo-panel {
+    background: var(--bg-surface);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    margin-bottom: 22px;
+  }
+  .demo-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    margin-bottom: 18px;
+    width: fit-content;
+  }
+  .demo-tab {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-weight: 500;
+  }
+  .demo-tab:hover { color: var(--text-primary); }
+  .demo-tab.active {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .demo-panel-content { display: none; }
+  .demo-panel-content.active { display: block; }
+
+  /* Stat tiles */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .stat-tile {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+  }
+  .stat-tile .label { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 500; }
+  .stat-tile .value { font-size: 22px; font-weight: 500; letter-spacing: -0.01em; }
+  .stat-tile .delta { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+
+  /* Bar chart — vertical */
+  .vbar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 140px;
+    padding-bottom: 4px;
+  }
+  .vbar {
+    flex: 1;
+    border-radius: 4px 4px 0 0;
+    background: var(--c-age);
+    transition: height 0.3s ease;
+    position: relative;
+    min-height: 4px;
+  }
+  .vbar.female { background: var(--c-female); }
+  .vbar.male   { background: var(--c-male); }
+  .vbar:hover { opacity: 0.85; }
+  .vbar-axis {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .vbar-axis > div {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+  .vbar-value-label {
+    position: absolute;
+    top: -18px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Horizontal bar list */
+  .hbar-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 56px;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .hbar-row .label { font-size: 13px; color: var(--text-primary); }
+  .hbar-track {
+    height: 8px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .hbar-fill {
+    height: 100%;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--accent-info);
+  }
+  .hbar-fill.life { background: var(--c-life); }
+  .hbar-fill.interest { background: var(--c-track); }
+  .hbar-row .num {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Gender split visual */
+  .gender-split-wrap {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 28px;
+    align-items: center;
+    padding: 12px 0;
+  }
+  .gender-bar {
+    height: 56px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex;
+    box-shadow: inset 0 0 0 0.5px var(--border-tertiary);
+  }
+  .gender-bar > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    transition: flex 0.4s ease;
+  }
+  .gender-bar .male   { background: var(--c-male); }
+  .gender-bar .female { background: var(--c-female); }
+  .gender-bar .other  { background: var(--text-tertiary); }
+  .gender-stats { display: flex; flex-direction: column; gap: 8px; }
+  .gender-stat {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px;
+  }
+  .gender-stat .swatch {
+    width: 12px; height: 12px; border-radius: 3px;
+  }
+
+  /* Treemap */
+  .treemap {
+    display: grid;
+    gap: 4px;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: 38px;
+  }
+  .tm-cell {
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .tm-cell:hover { transform: scale(1.02); z-index: 2; opacity: 0.92; }
+  .tm-cell .tm-name {
+    font-size: 12px; font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .tm-cell .tm-count {
+    font-size: 11px; opacity: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Heatmap */
+  .heatmap-wrap { overflow-x: auto; }
+  .heatmap {
+    display: grid;
+    gap: 2px;
+    margin-top: 8px;
+  }
+  .hm-cell {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    padding: 8px 6px;
+    font-size: 11px;
+    text-align: center;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    transition: transform 0.1s ease;
+    cursor: pointer;
+    min-height: 36px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hm-cell.hm-header {
+    background: transparent;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: default;
+    font-size: 11px;
+  }
+  .hm-cell:not(.hm-header):hover { transform: scale(1.05); z-index: 2; }
+  .hm-0 { background: var(--bg-secondary); color: var(--text-tertiary); }
+  .hm-1 { background: #dde9f6; color: var(--text-primary); }
+  .hm-2 { background: #b9d4ec; color: var(--text-primary); }
+  .hm-3 { background: #88b6dc; color: white; }
+  .hm-4 { background: #4f8ac0; color: white; }
+  .hm-5 { background: #1d5f9c; color: white; }
+
+  /* Geo bars (kept from v1) */
+  .geo-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 60px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .geo-row .label { font-size: 13px; }
+  .geo-track {
+    height: 8px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .geo-fill {
+    height: 100%;
+    background: var(--accent-info);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .geo-row .num {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Cadence */
+  .cadence {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 110px;
+    margin-top: 8px;
+  }
+  .cadence-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    background: var(--accent-info);
+    opacity: 0.55;
+    transition: height 0.3s ease, opacity 0.15s ease;
+  }
+  .cadence-bar:hover { opacity: 1; }
+  .cadence-axis {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    margin-top: 6px;
+  }
+
+  /* Pool cards — now with demographic strip */
+  .pools {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .pool-card {
+    background: var(--bg-surface);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .pool-card:hover {
+    border-color: var(--text-primary);
+    transform: translateY(-1px);
+  }
+  .pool-card .pool-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .pool-card .pool-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .pool-card .pool-size {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .pool-card .pool-size-label {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+  }
+  .pool-tags {
+    display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; margin-bottom: 12px;
+  }
+  .ptag {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  /* Demographic strip on pool cards */
+  .pool-demo-strip {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 0.5px solid var(--border-tertiary);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .pool-demo-cell {
+    text-align: left;
+  }
+  .pool-demo-cell .demo-label {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+  }
+  .pool-demo-cell .demo-value {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  /* Modal */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 20, 20, 0.5);
+    z-index: 50;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--bg-page);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 920px;
+    margin: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  }
+  .modal-header {
+    padding: 24px 28px 20px;
+    border-bottom: 0.5px solid var(--border-tertiary);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .modal-header .pool-name {
+    font-size: 22px;
+    font-weight: 500;
+  }
+  .modal-header .pool-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 0.5px solid var(--border-secondary);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .modal-body { padding: 24px 28px 28px; }
+  .modal-section { margin-bottom: 26px; }
+  .modal-section h4 {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 0 0 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .pool-stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .pool-stat {
+    background: var(--bg-surface);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+  }
+  .pool-stat .label { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; }
+  .pool-stat .value { font-size: 20px; font-weight: 500; }
+  .pool-stat .delta { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+
+  /* Demographic profile in modal */
+  .modal-demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+  .modal-demo-block {
+    background: var(--bg-surface);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+  }
+  .modal-demo-block h5 {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 0 0 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; }
+    nav { position: static; }
+    nav ul { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav-section { display: none; }
+    .filters { grid-template-columns: 1fr 1fr; }
+    .hero-strip { grid-template-columns: 1fr 1fr; }
+    .panel-row, .modal-demo-grid { grid-template-columns: 1fr; }
+    .pools { grid-template-columns: 1fr; }
+    .pool-stats-row, .stat-grid { grid-template-columns: 1fr 1fr; }
+    .gender-split-wrap { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">P</div>
+      <div class="brand-text">
+        <div class="crumb">Prospector › Audience Atlas</div>
+        <div class="title">Sports car racing audience · April 2026</div>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <span class="pill">Demo data</span>
+      <span class="pill-muted">Co-occurrence + Meta-style ad-targeting demographics</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <nav>
+      <ul>
+        <li><a class="active">Sports car racing</a></li>
+        <li><a>Cancer cause</a></li>
+        <li><a>Arts & culture</a></li>
+        <li><a>+ New atlas</a></li>
+      </ul>
+      <div class="nav-section">Tools</div>
+      <ul>
+        <li><a>Source coverage</a></li>
+        <li><a>Topic taxonomy</a></li>
+        <li><a>Export</a></li>
+      </ul>
+      <div class="nav-section">Source feeds</div>
+      <ul>
+        <li><a>Bluesky</a></li>
+        <li><a>X / Twitter</a></li>
+        <li><a>Reddit</a></li>
+        <li><a>News (GDELT)</a></li>
+        <li><a>Meta Ad Library</a></li>
+      </ul>
+    </nav>
+
+    <main>
+
+      <div class="demo-banner">
+        <span class="demo-banner-dot"></span>
+        <div>
+          Audience composition built from <strong>1.2M public posts</strong> (co-occurrence) layered with
+          <strong>Meta-style ad-targeting demographics</strong> at the audience-aggregate level. Demographic
+          panels reflect the platform's reported composition for advertisers targeting this interest cluster
+          — not individual-level attribute claims. Geography is self-disclosed where present.
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="field">
+          <label for="seedSel">Seed topic</label>
+          <select id="seedSel">
+            <option value="all_racing" selected>Sports car racing (all series)</option>
+            <option value="imsa">IMSA only</option>
+            <option value="f1">Formula 1 only</option>
+            <option value="nascar">NASCAR only</option>
+            <option value="indycar">IndyCar only</option>
+            <option value="wec">WEC / Le Mans only</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="windowSel">Time window</label>
+          <select id="windowSel">
+            <option value="12m" selected>Last 12 months</option>
+            <option value="6m">Last 6 months</option>
+            <option value="3m">Last 3 months</option>
+            <option value="30d">Last 30 days</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="minPostsSel">Min author activity</label>
+          <select id="minPostsSel">
+            <option value="1" selected>Any (1+ post)</option>
+            <option value="3">Engaged (3+ posts)</option>
+            <option value="10">Active (10+ posts)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="geoSel">Geography</label>
+          <select id="geoSel">
+            <option value="all" selected>All US</option>
+            <option value="ne">Northeast</option>
+            <option value="se">Southeast</option>
+            <option value="mw">Midwest</option>
+            <option value="w">West</option>
+          </select>
+        </div>
+        <div class="field">
+          <button class="primary" id="runBtn">Apply</button>
+        </div>
+      </div>
+
+      <div class="hero-strip">
+        <div class="hero-cell">
+          <div class="label">Posts ingested</div>
+          <div class="value" id="metricPosts">1,247,830</div>
+          <div class="delta">Across all platforms · last 12 months</div>
+        </div>
+        <div class="hero-cell">
+          <div class="label">Distinct authors</div>
+          <div class="value" id="metricAuthors">412,460</div>
+          <div class="delta">After dedup across platforms</div>
+        </div>
+        <div class="hero-cell">
+          <div class="label">Engaged authors</div>
+          <div class="value" id="metricEngaged">94,180</div>
+          <div class="delta">3+ posts on topic in window</div>
+        </div>
+        <div class="hero-cell">
+          <div class="label">Platform mix</div>
+          <div class="value" id="topPlatform" style="font-size: 22px;">X 41% · Bluesky 38%</div>
+          <div class="platform-mini" id="platformBars">
+            <div class="platform-seg active" style="flex: 41;"><span class="pseg-label">X</span></div>
+            <div class="platform-seg active" style="flex: 38; opacity: 0.7;"><span class="pseg-label">Bsky</span></div>
+            <div class="platform-seg active" style="flex: 14; opacity: 0.5;"><span class="pseg-label">Reddit</span></div>
+            <div class="platform-seg active" style="flex: 7; opacity: 0.3;"><span class="pseg-label">Other</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Co-topics + heatmap row -->
+      <div class="panel-row">
+        <div class="panel">
+          <h3>Co-occurring topics</h3>
+          <div class="panel-sub">Other topics this audience posts about. Cell size = number of authors who posted about both. Click a topic to filter.</div>
+          <div class="treemap" id="treemap"></div>
+          <div class="footnote">Top 12 topics out of 184 surfaced. Sized by author overlap with the seed.</div>
+        </div>
+        <div class="panel">
+          <h3>Brand affinity matrix</h3>
+          <div class="panel-sub">Racing series × manufacturers. Cell value = % of series-fan authors who posted about the maker.</div>
+          <div class="heatmap-wrap"><div class="heatmap" id="heatmap"></div></div>
+          <div class="footnote">Darker cells = stronger overlap. F1 and Ferrari road-car fans cross-pollinate heavily.</div>
+        </div>
+      </div>
+
+      <!-- ============== AUDIENCE COMPOSITION (DEMOGRAPHICS) ============== -->
+      <div class="demo-panel">
+        <h3 style="margin: 0 0 4px;">Audience composition</h3>
+        <div class="panel-sub">
+          Meta-style ad-targeting demographics for this interest cluster. Aggregate composition only —
+          no individual-level inference. Reflects what the platform reports to advertisers building this
+          audience segment.
+        </div>
+
+        <div class="demo-tabs">
+          <button class="demo-tab active" data-demo="age">Age</button>
+          <button class="demo-tab" data-demo="gender">Gender</button>
+          <button class="demo-tab" data-demo="life">Life stage</button>
+          <button class="demo-tab" data-demo="interests">Top interests</button>
+        </div>
+
+        <!-- Age -->
+        <div class="demo-panel-content active" id="demo-age">
+          <div class="stat-grid" id="ageStats"></div>
+          <div style="margin-top: 8px; padding: 12px 4px 4px;">
+            <div class="vbar-chart" id="ageBars"></div>
+            <div class="vbar-axis" id="ageAxis"></div>
+          </div>
+          <div class="footnote">Age brackets reflect Meta-style audience composition for this interest cluster, not self-disclosed individual ages.</div>
+        </div>
+
+        <!-- Gender -->
+        <div class="demo-panel-content" id="demo-gender">
+          <div class="gender-split-wrap">
+            <div>
+              <div class="gender-bar" id="genderBar"></div>
+              <div class="footnote" style="margin-top: 12px;">Aggregate gender composition reported by the platform for this audience. Comparison vs all sports audiences shown in the side panel.</div>
+            </div>
+            <div class="gender-stats" id="genderStats"></div>
+          </div>
+        </div>
+
+        <!-- Life stage -->
+        <div class="demo-panel-content" id="demo-life">
+          <div id="lifeBars"></div>
+          <div class="footnote">Life-stage signals from Meta's Detailed Targeting categories — parental status, home ownership, education level, relationship status. Aggregate composition only.</div>
+        </div>
+
+        <!-- Top interests -->
+        <div class="demo-panel-content" id="demo-interests">
+          <div id="interestBars"></div>
+          <div class="footnote">Top interest categories that over-index for this audience vs the platform baseline. Affinity index 100 = baseline; 200 = 2× more likely than average.</div>
+        </div>
+      </div>
+
+      <!-- Geo + cadence -->
+      <div class="panel-row">
+        <div class="panel">
+          <h3>Geographic concentration</h3>
+          <div class="panel-sub">Top metros / states by author count. Self-disclosed profile location where present.</div>
+          <div id="geoBars"></div>
+          <div class="footnote">Profile location is observed where users disclosed it. ~38% of authors have no location field and are excluded.</div>
+        </div>
+        <div class="panel">
+          <h3>Posting cadence</h3>
+          <div class="panel-sub">Posts per week across the audience. Spikes correspond to race weekends; visible seasonality.</div>
+          <div class="cadence" id="cadence"></div>
+          <div class="cadence-axis"><span>Apr '25</span><span>Jul '25</span><span>Oct '25</span><span>Jan '26</span><span>Apr '26</span></div>
+          <div class="footnote">Includes original posts, replies, and quotes.</div>
+        </div>
+      </div>
+
+      <!-- Passion pools -->
+      <div class="panel">
+        <h3>Passion pools (overlap clusters)</h3>
+        <div class="panel-sub">Named clusters where racing fandom overlaps with another high-co-occurrence topic. Each is the set of authors who posted about both within the window. Demographic strip shows the platform-reported composition for the pool.</div>
+        <div class="pools" id="pools"></div>
+        <div class="footnote">Pool labels describe the overlap set — they are not modeled segments or lookalikes. Membership is determined by direct topic co-occurrence in the post stream.</div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Pool drill-in modal -->
+<div class="modal-backdrop" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div style="flex: 1;">
+        <div class="pool-name" id="poolName">—</div>
+        <div class="pool-sub" id="poolSub">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="pool-stats-row" id="poolStats"></div>
+
+      <div class="modal-section">
+        <h4>Demographic profile</h4>
+        <div class="modal-demo-grid">
+          <div class="modal-demo-block">
+            <h5>Age distribution</h5>
+            <div id="poolAgeBars"></div>
+          </div>
+          <div class="modal-demo-block">
+            <h5>Gender</h5>
+            <div class="gender-bar" id="poolGenderBar" style="margin-bottom: 12px;"></div>
+            <div class="gender-stats" id="poolGenderStats"></div>
+          </div>
+        </div>
+        <div class="modal-demo-grid">
+          <div class="modal-demo-block">
+            <h5>Life stage</h5>
+            <div id="poolLifeBars"></div>
+          </div>
+          <div class="modal-demo-block">
+            <h5>Top interests (over-index)</h5>
+            <div id="poolInterestBars"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h4>What else they post about</h4>
+        <div id="poolCoTopics"></div>
+      </div>
+
+      <div class="modal-section">
+        <h4>Where they cluster</h4>
+        <div id="poolGeo"></div>
+      </div>
+
+      <div class="modal-section">
+        <h4>Use cases</h4>
+        <div class="panel" style="padding: 14px 16px;">
+          <div id="poolUseCases" style="font-size: 13px; line-height: 1.6;"></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="primary" onclick="alert('In production: opens the People page filtered to authors in this pool. From there you can resolve to canonical persons and run enrichment / outreach workflows.')">View authors in this pool →</button>
+        <button class="primary" style="background: var(--bg-surface); color: var(--text-primary); border: 0.5px solid var(--border-secondary);" onclick="alert('In production: drops a CSV of pool author handles, post counts, observed topic frequencies, and Meta-style audience composition for media planning.')">↓ Export pool</button>
+        <button class="primary" style="background: var(--bg-surface); color: var(--text-primary); border: 0.5px solid var(--border-secondary);" onclick="alert('In production: opens a Meta Ads Manager-ready audience definition file (.csv or saved-audience JSON).')">→ Push to Ads Manager</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // =========================================================
+  // SEED-LEVEL DATA
+  // =========================================================
+  const SEED_DATA = {
+    all_racing: {
+      posts: 1247830, authors: 412460, engaged: 94180,
+      platforms: [["X", 41], ["Bsky", 38], ["Reddit", 14], ["Other", 7]],
+      treemap: [
+        { name: "Luxury automotive (general)", n: 187420, c: "var(--c-imsa)" },
+        { name: "Premium watches",             n: 142880, c: "var(--c-watch)" },
+        { name: "Aviation",                    n:  98640, c: "var(--c-aviation)" },
+        { name: "Single malt / spirits",       n:  87320, c: "var(--c-spirits)" },
+        { name: "Golf",                        n:  78410, c: "var(--c-golf)" },
+        { name: "Track days",                  n:  62150, c: "var(--c-track)" },
+        { name: "Yachting",                    n:  47810, c: "var(--c-wec)" },
+        { name: "Cycling",                     n:  41280, c: "var(--c-indy)" },
+        { name: "Tech / startups",             n:  38940, c: "var(--c-f1)" },
+        { name: "College football",            n:  36120, c: "var(--c-rally)" },
+        { name: "Photography",                 n:  31840, c: "var(--c-nascar)" },
+        { name: "Endurance sports",            n:  29470, c: "var(--c-indy)" },
+      ],
+      geo: [
+        ["Florida", 18.4], ["California", 16.2], ["Texas", 12.7],
+        ["NY metro", 8.9], ["Ohio", 4.6], ["Illinois", 4.2],
+        ["Georgia", 3.8], ["Michigan", 3.4],
+      ],
+      cadence: [
+        12,14,15,28,18,16,14,32,17,15,14,26,16,14,15,30,18,15,14,25,17,15,
+        14,21,16,14,15,22,16,14,15,18,16,15,14,17,16,15,14,16,15,14,15,15,
+        16,17,18,22,28,32,38,30
+      ],
+      // Meta-style demographics
+      age: [
+        ["18-24", 12], ["25-34", 24], ["35-44", 27],
+        ["45-54", 19], ["55-64", 12], ["65+", 6],
+      ],
+      gender: { male: 71, female: 27, other: 2 },
+      lifeStage: [
+        { label: "Parents (school-age children)", pct: 38, idx: 142 },
+        { label: "Homeowners",                    pct: 64, idx: 128 },
+        { label: "College+ educated",             pct: 58, idx: 118 },
+        { label: "Married / domestic partner",    pct: 56, idx: 112 },
+        { label: "Frequent international travelers", pct: 22, idx: 178 },
+        { label: "New car shoppers (90d window)", pct: 18, idx: 195 },
+      ],
+      interests: [
+        { label: "Luxury vehicles",        idx: 312 },
+        { label: "Premium watches",        idx: 248 },
+        { label: "Aviation enthusiasts",   idx: 224 },
+        { label: "Golf",                   idx: 168 },
+        { label: "Wine / spirits",         idx: 156 },
+        { label: "Outdoor / camping",      idx: 142 },
+        { label: "Tech / consumer electronics", idx: 138 },
+        { label: "Travel",                 idx: 132 },
+      ],
+    },
+    imsa: {
+      posts: 318420, authors: 94120, engaged: 28640,
+      platforms: [["X", 38], ["Bsky", 41], ["Reddit", 16], ["Other", 5]],
+      treemap: [
+        { name: "Porsche",                n: 41240, c: "var(--c-imsa)" },
+        { name: "Le Mans / WEC",          n: 32180, c: "var(--c-wec)" },
+        { name: "Track days",             n: 28640, c: "var(--c-track)" },
+        { name: "Premium watches",        n: 24180, c: "var(--c-watch)" },
+        { name: "Endurance sports",       n: 19420, c: "var(--c-indy)" },
+        { name: "Aviation",               n: 17840, c: "var(--c-aviation)" },
+        { name: "Cycling",                n: 14620, c: "var(--c-indy)" },
+        { name: "F1 (cross-fan)",         n: 13420, c: "var(--c-f1)" },
+        { name: "Photography",            n: 11240, c: "var(--c-nascar)" },
+        { name: "Single malt / spirits",  n:  9840, c: "var(--c-spirits)" },
+        { name: "Acura / Cadillac",       n:  9120, c: "var(--c-rally)" },
+        { name: "Yachting",               n:  6840, c: "var(--c-wec)" },
+      ],
+      geo: [
+        ["Florida", 21.8], ["California", 14.6], ["Texas", 11.2],
+        ["NY metro", 9.4], ["Georgia", 5.1], ["Ohio", 4.3], ["Michigan", 3.8],
+      ],
+      cadence: [
+        14,16,18,42,20,18,16,38,18,17,16,32,18,17,18,46,22,19,17,28,
+        20,18,16,24,18,17,18,22,18,17,16,20,18,17,18,28,32,18,16,18,
+        17,16,18,17,18,21,24,32,38,42,36,28
+      ],
+      age: [
+        ["18-24", 8], ["25-34", 18], ["35-44", 28],
+        ["45-54", 24], ["55-64", 16], ["65+", 6],
+      ],
+      gender: { male: 78, female: 21, other: 1 },
+      lifeStage: [
+        { label: "Parents (school-age children)", pct: 42, idx: 158 },
+        { label: "Homeowners",                    pct: 71, idx: 142 },
+        { label: "College+ educated",             pct: 64, idx: 131 },
+        { label: "Married / domestic partner",    pct: 62, idx: 124 },
+        { label: "Luxury vehicle owners",         pct: 28, idx: 312 },
+        { label: "New car shoppers (90d window)", pct: 22, idx: 244 },
+      ],
+      interests: [
+        { label: "Luxury vehicles",        idx: 384 },
+        { label: "Performance / track",    idx: 312 },
+        { label: "Premium watches",        idx: 264 },
+        { label: "Aviation enthusiasts",   idx: 218 },
+        { label: "Wine / spirits",         idx: 182 },
+        { label: "Endurance sports",       idx: 178 },
+        { label: "Photography",            idx: 156 },
+        { label: "Travel (international)", idx: 168 },
+      ],
+    },
+    f1: {
+      posts: 612480, authors: 198640, engaged: 41280,
+      platforms: [["X", 48], ["Bsky", 28], ["Reddit", 18], ["Other", 6]],
+      treemap: [
+        { name: "Mercedes / Ferrari (road)",   n: 78240, c: "var(--c-f1)" },
+        { name: "Premium watches",             n: 64180, c: "var(--c-watch)" },
+        { name: "Aviation",                    n: 47820, c: "var(--c-aviation)" },
+        { name: "Tech / startups",             n: 42140, c: "var(--c-f1)" },
+        { name: "Fashion",                     n: 38920, c: "var(--c-imsa)" },
+        { name: "Travel / luxury hotels",      n: 31420, c: "var(--c-aviation)" },
+        { name: "Football (soccer)",           n: 29840, c: "var(--c-golf)" },
+        { name: "Single malt",                 n: 24180, c: "var(--c-spirits)" },
+        { name: "Photography",                 n: 21420, c: "var(--c-nascar)" },
+        { name: "Yachting",                    n: 18640, c: "var(--c-wec)" },
+        { name: "Cycling",                     n: 15240, c: "var(--c-indy)" },
+        { name: "Golf",                        n: 12480, c: "var(--c-golf)" },
+      ],
+      geo: [
+        ["California", 19.2], ["NY metro", 14.8], ["Florida", 11.4],
+        ["Texas", 9.6], ["Illinois", 5.3], ["Washington", 4.2], ["Massachusetts", 3.8],
+      ],
+      cadence: [
+        16,18,42,22,19,18,52,21,19,18,46,22,19,18,38,21,19,18,42,22,
+        19,18,32,21,19,18,22,19,18,17,21,19,18,17,32,38,21,19,18,17,
+        21,19,18,17,21,28,42,52,46,38,32,28
+      ],
+      age: [
+        ["18-24", 18], ["25-34", 32], ["35-44", 24],
+        ["45-54", 14], ["55-64", 8], ["65+", 4],
+      ],
+      gender: { male: 68, female: 30, other: 2 },
+      lifeStage: [
+        { label: "Single",                        pct: 42, idx: 138 },
+        { label: "College+ educated",             pct: 72, idx: 148 },
+        { label: "Frequent international travelers", pct: 38, idx: 312 },
+        { label: "Tech industry employees",       pct: 28, idx: 264 },
+        { label: "Homeowners",                    pct: 48, idx: 96 },
+        { label: "Parents (school-age children)", pct: 22, idx: 82 },
+      ],
+      interests: [
+        { label: "Tech / consumer electronics", idx: 286 },
+        { label: "Premium watches",        idx: 264 },
+        { label: "Travel (luxury / international)", idx: 242 },
+        { label: "Fashion / streetwear",   idx: 198 },
+        { label: "Soccer / football",      idx: 188 },
+        { label: "Aviation",               idx: 174 },
+        { label: "Wine / spirits",         idx: 152 },
+        { label: "Cycling",                idx: 138 },
+      ],
+    },
+    nascar: {
+      posts: 184320, authors: 71240, engaged: 18420,
+      platforms: [["X", 51], ["Bsky", 14], ["Reddit", 24], ["Other", 11]],
+      treemap: [
+        { name: "Country music",               n: 32140, c: "var(--c-rally)" },
+        { name: "College football",            n: 28640, c: "var(--c-rally)" },
+        { name: "Hunting / outdoors",          n: 24180, c: "var(--c-spirits)" },
+        { name: "American muscle cars",        n: 21420, c: "var(--c-nascar)" },
+        { name: "Truck enthusiasts",           n: 18640, c: "var(--c-rally)" },
+        { name: "Dirt track / short track",    n: 16240, c: "var(--c-track)" },
+        { name: "BBQ / smoking",               n: 14380, c: "var(--c-spirits)" },
+        { name: "Bourbon / whiskey",           n: 12240, c: "var(--c-spirits)" },
+        { name: "Boating (freshwater)",        n: 10840, c: "var(--c-wec)" },
+        { name: "Iron / blue-collar trades",   n:  9420, c: "var(--c-rally)" },
+        { name: "Family / faith",              n:  8240, c: "var(--c-nascar)" },
+        { name: "Photography",                 n:  7180, c: "var(--c-nascar)" },
+      ],
+      geo: [
+        ["North Carolina", 22.4], ["Tennessee", 14.2], ["Georgia", 11.8],
+        ["Florida", 9.2], ["Texas", 8.4], ["Ohio", 5.1], ["Indiana", 4.4],
+      ],
+      cadence: [
+        18,22,32,18,17,22,28,18,17,21,28,18,17,22,32,18,17,21,28,18,
+        17,21,28,18,17,22,28,18,17,22,28,18,17,21,28,18,17,21,28,18,
+        17,22,28,18,17,21,28,32,38,28,22,18
+      ],
+      age: [
+        ["18-24", 7], ["25-34", 14], ["35-44", 22],
+        ["45-54", 26], ["55-64", 22], ["65+", 9],
+      ],
+      gender: { male: 76, female: 23, other: 1 },
+      lifeStage: [
+        { label: "Parents (children any age)",     pct: 58, idx: 162 },
+        { label: "Homeowners",                     pct: 72, idx: 144 },
+        { label: "Married / domestic partner",     pct: 68, idx: 138 },
+        { label: "Truck owners",                   pct: 41, idx: 312 },
+        { label: "High school / some college",     pct: 52, idx: 124 },
+        { label: "Active military or veteran",     pct: 18, idx: 186 },
+      ],
+      interests: [
+        { label: "Country music",          idx: 312 },
+        { label: "Hunting / fishing",      idx: 286 },
+        { label: "American muscle cars",   idx: 268 },
+        { label: "BBQ / smoking",          idx: 224 },
+        { label: "Bourbon / American whiskey", idx: 198 },
+        { label: "College football (SEC)", idx: 192 },
+        { label: "Boating (freshwater)",   idx: 174 },
+        { label: "Faith / religion",       idx: 142 },
+      ],
+    },
+    indycar: {
+      posts: 78420, authors: 32140, engaged: 8420,
+      platforms: [["X", 44], ["Bsky", 22], ["Reddit", 28], ["Other", 6]],
+      treemap: [
+        { name: "Indianapolis 500",            n: 18420, c: "var(--c-indy)" },
+        { name: "American open-wheel history", n: 12480, c: "var(--c-indy)" },
+        { name: "Track days",                  n:  9240, c: "var(--c-track)" },
+        { name: "F1 (cross-fan)",              n:  8420, c: "var(--c-f1)" },
+        { name: "Aviation",                    n:  6840, c: "var(--c-aviation)" },
+        { name: "Premium watches",             n:  5240, c: "var(--c-watch)" },
+        { name: "Cycling",                     n:  4180, c: "var(--c-indy)" },
+        { name: "Photography",                 n:  3920, c: "var(--c-nascar)" },
+        { name: "College football",            n:  3240, c: "var(--c-rally)" },
+        { name: "Boating",                     n:  2840, c: "var(--c-wec)" },
+        { name: "Tech / startups",             n:  2480, c: "var(--c-f1)" },
+        { name: "Bourbon",                     n:  2240, c: "var(--c-spirits)" },
+      ],
+      geo: [
+        ["Indiana", 28.4], ["Ohio", 14.2], ["Michigan", 10.8],
+        ["Illinois", 8.6], ["California", 6.4], ["Texas", 5.2],
+      ],
+      cadence: [
+        12,14,16,18,32,18,16,17,28,18,16,17,21,18,16,42,21,18,16,17,
+        21,18,16,17,21,18,16,17,21,18,16,17,21,18,16,17,21,18,16,17,
+        21,18,16,17,21,18,16,17,21,28,18,14
+      ],
+      age: [
+        ["18-24", 6], ["25-34", 14], ["35-44", 24],
+        ["45-54", 26], ["55-64", 21], ["65+", 9],
+      ],
+      gender: { male: 73, female: 26, other: 1 },
+      lifeStage: [
+        { label: "Homeowners",                    pct: 74, idx: 148 },
+        { label: "Parents (older children/empty nest)", pct: 41, idx: 132 },
+        { label: "Married / domestic partner",    pct: 64, idx: 128 },
+        { label: "Midwest residents",             pct: 58, idx: 264 },
+        { label: "College+ educated",             pct: 54, idx: 110 },
+        { label: "Active travelers (Indy 500)",   pct: 22, idx: 184 },
+      ],
+      interests: [
+        { label: "Indianapolis 500",       idx: 412 },
+        { label: "Open-wheel racing history", idx: 286 },
+        { label: "American manufacturing", idx: 198 },
+        { label: "Track days",             idx: 168 },
+        { label: "Bourbon / American whiskey", idx: 152 },
+        { label: "College football",       idx: 138 },
+        { label: "Boating (Great Lakes)",  idx: 132 },
+      ],
+    },
+    wec: {
+      posts: 91240, authors: 36180, engaged: 10240,
+      platforms: [["X", 32], ["Bsky", 46], ["Reddit", 18], ["Other", 4]],
+      treemap: [
+        { name: "Le Mans 24",                  n: 28420, c: "var(--c-wec)" },
+        { name: "IMSA (cross-fan)",            n: 18640, c: "var(--c-imsa)" },
+        { name: "Porsche / Ferrari hypercars", n: 14820, c: "var(--c-imsa)" },
+        { name: "European motorsport history", n: 11240, c: "var(--c-rally)" },
+        { name: "Premium watches",             n:  9420, c: "var(--c-watch)" },
+        { name: "Aviation",                    n:  7240, c: "var(--c-aviation)" },
+        { name: "Photography",                 n:  6420, c: "var(--c-nascar)" },
+        { name: "Endurance sports",            n:  5840, c: "var(--c-indy)" },
+        { name: "Travel / France",             n:  4820, c: "var(--c-aviation)" },
+        { name: "Single malt",                 n:  4180, c: "var(--c-spirits)" },
+        { name: "Cycling",                     n:  3640, c: "var(--c-indy)" },
+        { name: "Yachting",                    n:  2840, c: "var(--c-wec)" },
+      ],
+      geo: [
+        ["California", 16.2], ["NY metro", 14.8], ["Florida", 11.4],
+        ["Texas", 8.6], ["Illinois", 5.4], ["Washington", 4.8],
+      ],
+      cadence: [
+        14,16,18,21,28,18,16,17,21,18,16,38,28,18,16,17,21,18,16,17,
+        21,18,16,17,52,38,18,16,17,21,18,16,17,21,18,16,17,21,18,16,
+        17,21,18,16,17,21,18,16,42,28,18,14
+      ],
+      age: [
+        ["18-24", 11], ["25-34", 24], ["35-44", 28],
+        ["45-54", 21], ["55-64", 12], ["65+", 4],
+      ],
+      gender: { male: 72, female: 26, other: 2 },
+      lifeStage: [
+        { label: "Frequent international travelers", pct: 41, idx: 312 },
+        { label: "College+ educated",             pct: 78, idx: 158 },
+        { label: "Homeowners",                    pct: 62, idx: 124 },
+        { label: "Luxury vehicle owners",         pct: 26, idx: 286 },
+        { label: "Wine / fine dining enthusiasts", pct: 38, idx: 218 },
+        { label: "Tech / engineering employees",  pct: 24, idx: 232 },
+      ],
+      interests: [
+        { label: "Le Mans / endurance",     idx: 412 },
+        { label: "Hypercars (road)",        idx: 312 },
+        { label: "European travel",         idx: 264 },
+        { label: "Premium watches",         idx: 244 },
+        { label: "Wine (French/Italian)",   idx: 198 },
+        { label: "Photography",             idx: 184 },
+        { label: "Aviation",                idx: 172 },
+        { label: "Vintage racing",          idx: 168 },
+      ],
+    },
+  };
+
+  // =========================================================
+  // Heatmap data
+  // =========================================================
+  const SERIES = ["IMSA","F1","NASCAR","IndyCar","WEC"];
+  const MAKERS = ["Porsche","Ferrari","BMW M","Mercedes","Aston Martin","Cadillac","Acura","Chevrolet","Ford","McLaren"];
+  const HEATMAP_DATA = {
+    "IMSA":    [62, 41, 38, 18, 32, 28, 24, 22, 16, 21],
+    "F1":      [21, 54, 26, 48, 22,  4,  3,  6,  4, 38],
+    "NASCAR":  [ 8,  6,  5,  3,  2, 12,  4, 64, 58,  3],
+    "IndyCar": [16, 18, 14,  8,  6, 12, 24, 28, 22, 12],
+    "WEC":     [54, 48, 24, 18, 28, 14, 21,  6,  4, 32],
+  };
+
+  // =========================================================
+  // PASSION POOLS — now with full demographic data
+  // =========================================================
+  const POOLS = [
+    {
+      id: "endurance_athletes",
+      name: "Endurance Athletes",
+      desc: "Authors who post about both racing and triathlon, marathon, or cycling at competitive volume.",
+      size: 28640,
+      tags: ["IMSA × Endurance sports", "WEC × Cycling"],
+      stripDemo: { age: "35-44", gender: "M 68%", lifestage: "62% homeowners" },
+      stats: [
+        { label: "Distinct authors", value: "28,640", delta: "6.9% of seed audience" },
+        { label: "Avg posts / month", value: "8.4", delta: "Above-average activity" },
+        { label: "Top platform", value: "Bluesky", delta: "52% of pool" },
+        { label: "Engagement rate", value: "3.2%", delta: "Replies + quotes / posts" },
+      ],
+      age: [["18-24", 6], ["25-34", 22], ["35-44", 32], ["45-54", 24], ["55-64", 12], ["65+", 4]],
+      gender: { male: 68, female: 31, other: 1 },
+      lifeStage: [
+        { label: "College+ educated",             pct: 78, idx: 158 },
+        { label: "Homeowners",                    pct: 72, idx: 144 },
+        { label: "Parents (school-age children)", pct: 36, idx: 132 },
+        { label: "Married / partner",             pct: 64, idx: 128 },
+        { label: "Wearables owners (Garmin/Apple Watch Ultra)", pct: 64, idx: 412 },
+      ],
+      interests: [
+        { label: "Triathlon / endurance", idx: 412 },
+        { label: "Cycling / road bikes",  idx: 364 },
+        { label: "Garmin / wearables",    idx: 312 },
+        { label: "Coffee (specialty)",    idx: 218 },
+        { label: "Premium watches",       idx: 184 },
+      ],
+      coTopics: [
+        ["Triathlon training", 64], ["Cycling gear", 58], ["Marathon", 41],
+        ["Open-water swimming", 32], ["Premium watches", 38], ["Coffee", 36],
+        ["Trail running", 28], ["Garmin / wearables", 26],
+      ],
+      geo: [["California", 18.4], ["Florida", 14.2], ["NY metro", 11.6], ["Texas", 8.8], ["Illinois", 5.4]],
+      useCases: [
+        "<strong>Endurance event sponsors</strong> — tri / open-water swim / cycling brands targeting an affluent active demographic.",
+        "<strong>Sports nutrition</strong> — premium hydration, recovery, and gel products with a cross-discipline customer.",
+        "<strong>Watch / wearable brands</strong> — Garmin, Apple Watch Ultra, Suunto already heavily co-occur with this pool.",
+      ],
+    },
+    {
+      id: "luxury_collectors",
+      name: "Luxury Collectors",
+      desc: "Racing fans whose post stream also includes premium watches, aviation, and fine spirits at high frequency.",
+      size: 64180,
+      tags: ["F1 × Watches", "IMSA × Aviation", "Premium spirits"],
+      stripDemo: { age: "45-54", gender: "M 82%", lifestage: "84% homeowners" },
+      stats: [
+        { label: "Distinct authors", value: "64,180", delta: "15.6% of seed audience" },
+        { label: "Avg posts / month", value: "4.1", delta: "Lower volume, higher value" },
+        { label: "Top platform", value: "X", delta: "58% of pool" },
+        { label: "Engagement rate", value: "1.8%", delta: "Lower; more passive consumers" },
+      ],
+      age: [["18-24", 3], ["25-34", 11], ["35-44", 24], ["45-54", 32], ["55-64", 22], ["65+", 8]],
+      gender: { male: 82, female: 17, other: 1 },
+      lifeStage: [
+        { label: "Homeowners",                    pct: 84, idx: 168 },
+        { label: "College+ educated",             pct: 71, idx: 144 },
+        { label: "Married / partner",             pct: 72, idx: 144 },
+        { label: "Frequent international travelers", pct: 48, idx: 384 },
+        { label: "Luxury vehicle owners",         pct: 38, idx: 412 },
+        { label: "High-net-worth signal (private aviation engagement)", pct: 14, idx: 642 },
+      ],
+      interests: [
+        { label: "Premium watches",        idx: 412 },
+        { label: "Aviation",               idx: 364 },
+        { label: "Single malt / spirits",  idx: 312 },
+        { label: "Yachting",               idx: 286 },
+        { label: "Fine dining",            idx: 224 },
+      ],
+      coTopics: [
+        ["Premium watches", 78], ["Aviation", 62], ["Single malt whisky", 54],
+        ["Yachting", 38], ["Fine dining", 36], ["Travel / luxury hotels", 41],
+        ["Cigars", 24], ["Art collecting", 18],
+      ],
+      geo: [["NY metro", 21.4], ["California", 16.8], ["Florida", 14.2], ["Texas", 9.6], ["Illinois", 4.4]],
+      useCases: [
+        "<strong>Luxury automotive</strong> — Ferrari, Aston Martin, McLaren road-car launches.",
+        "<strong>Watch brands</strong> — Rolex, AP, Patek, Richard Mille; very high co-occurrence.",
+        "<strong>Private aviation</strong> — NetJets, Wheels Up have direct engagement with this pool.",
+      ],
+    },
+    {
+      id: "track_day_enthusiasts",
+      name: "Track Day Enthusiasts",
+      desc: "Active drivers — they own performance cars and post about their own track time. Distinct from spectators.",
+      size: 41280,
+      tags: ["Porsche × Track days", "BMW M × Track days", "HPDE / autocross"],
+      stripDemo: { age: "35-44", gender: "M 86%", lifestage: "76% homeowners" },
+      stats: [
+        { label: "Distinct authors", value: "41,280", delta: "10.0% of seed audience" },
+        { label: "Avg posts / month", value: "11.2", delta: "Highest-activity pool" },
+        { label: "Top platform", value: "X", delta: "44% of pool · Reddit 28%" },
+        { label: "Engagement rate", value: "5.4%", delta: "Discussion-heavy community" },
+      ],
+      age: [["18-24", 5], ["25-34", 24], ["35-44", 34], ["45-54", 22], ["55-64", 12], ["65+", 3]],
+      gender: { male: 86, female: 13, other: 1 },
+      lifeStage: [
+        { label: "Homeowners",                    pct: 76, idx: 152 },
+        { label: "Married / partner",             pct: 58, idx: 116 },
+        { label: "College+ educated",             pct: 64, idx: 130 },
+        { label: "Tech / engineering employees",  pct: 32, idx: 268 },
+        { label: "Performance vehicle owners",    pct: 84, idx: 712 },
+      ],
+      interests: [
+        { label: "Performance / track",    idx: 484 },
+        { label: "Porsche GT3/GT4",        idx: 412 },
+        { label: "BMW M2/M4",              idx: 364 },
+        { label: "Tire / brake upgrades",  idx: 312 },
+        { label: "Driver training schools", idx: 264 },
+      ],
+      coTopics: [
+        ["Porsche GT3 / GT4", 68], ["BMW M2 / M4", 54], ["Track day organizations", 52],
+        ["Tire / brake upgrades", 41], ["Driver training schools", 32], ["GoPro / dash cams", 28],
+        ["Garage / shop builds", 24], ["Autocross", 18],
+      ],
+      geo: [["California", 22.8], ["Texas", 14.4], ["Florida", 11.6], ["NY metro", 8.4], ["Georgia", 5.2]],
+      useCases: [
+        "<strong>Performance tire / brake brands</strong> — Michelin Pilot Sport, Hankook, Brembo.",
+        "<strong>Driver training schools</strong> — Skip Barber, BMW Performance Center, Porsche Experience.",
+        "<strong>Dashcam / data brands</strong> — GoPro, Aim, RaceCapture have direct customer overlap.",
+      ],
+    },
+    {
+      id: "american_iron",
+      name: "American Iron",
+      desc: "NASCAR plus muscle cars, country music, college football. Coherent regional identity.",
+      size: 32140,
+      tags: ["NASCAR × Country", "Muscle cars × Football"],
+      stripDemo: { age: "45-54", gender: "M 78%", lifestage: "74% parents" },
+      stats: [
+        { label: "Distinct authors", value: "32,140", delta: "7.8% of seed audience" },
+        { label: "Avg posts / month", value: "9.8", delta: "Highly active" },
+        { label: "Top platform", value: "X", delta: "58% of pool · Reddit 22%" },
+        { label: "Engagement rate", value: "4.6%", delta: "Strong reply culture" },
+      ],
+      age: [["18-24", 6], ["25-34", 14], ["35-44", 22], ["45-54", 28], ["55-64", 22], ["65+", 8]],
+      gender: { male: 78, female: 21, other: 1 },
+      lifeStage: [
+        { label: "Parents (any age children)",    pct: 74, idx: 184 },
+        { label: "Married / partner",             pct: 71, idx: 142 },
+        { label: "Homeowners",                    pct: 76, idx: 152 },
+        { label: "Truck owners",                  pct: 58, idx: 412 },
+        { label: "High school / some college",    pct: 56, idx: 132 },
+        { label: "Active military or veteran",    pct: 22, idx: 218 },
+      ],
+      interests: [
+        { label: "Country music",          idx: 412 },
+        { label: "Hunting / fishing",      idx: 364 },
+        { label: "American muscle cars",   idx: 312 },
+        { label: "BBQ / smoking",          idx: 268 },
+        { label: "Bourbon",                idx: 224 },
+      ],
+      coTopics: [
+        ["Country music", 72], ["College football", 64], ["Muscle cars (Mustang/Camaro)", 58],
+        ["Hunting / outdoors", 51], ["BBQ", 41], ["Bourbon", 38],
+        ["Truck pulls / drag racing", 32], ["Faith / family", 28],
+      ],
+      geo: [["North Carolina", 24.2], ["Tennessee", 14.6], ["Georgia", 12.4], ["Florida", 8.8], ["Texas", 7.6]],
+      useCases: [
+        "<strong>Truck OEMs</strong> — Ford F-Series, Chevy Silverado, Ram have natural fit.",
+        "<strong>Spirits brands</strong> — bourbon (Buffalo Trace, Maker's Mark) over-indexes vs Scotch.",
+        "<strong>Outdoor / hunting brands</strong> — Yeti, Cabela's, Bass Pro have direct customer overlap.",
+      ],
+    },
+    {
+      id: "tech_petrolheads",
+      name: "Tech Petrolheads",
+      desc: "F1 fans who also post about tech, startups, and venture. SF Bay-skewed; coherent professional cluster.",
+      size: 38920,
+      tags: ["F1 × Tech", "F1 × Startups"],
+      stripDemo: { age: "25-34", gender: "M 71%", lifestage: "82% college+" },
+      stats: [
+        { label: "Distinct authors", value: "38,920", delta: "9.4% of seed audience" },
+        { label: "Avg posts / month", value: "6.2", delta: "Steady activity" },
+        { label: "Top platform", value: "X", delta: "62% of pool" },
+        { label: "Engagement rate", value: "2.8%", delta: "Long-thread community" },
+      ],
+      age: [["18-24", 14], ["25-34", 38], ["35-44", 28], ["45-54", 12], ["55-64", 6], ["65+", 2]],
+      gender: { male: 71, female: 27, other: 2 },
+      lifeStage: [
+        { label: "College+ educated",             pct: 82, idx: 168 },
+        { label: "Tech industry employees",       pct: 48, idx: 412 },
+        { label: "Frequent international travelers", pct: 38, idx: 312 },
+        { label: "Homeowners",                    pct: 42, idx: 84 },
+        { label: "Single",                        pct: 48, idx: 158 },
+      ],
+      interests: [
+        { label: "Tech / consumer electronics", idx: 384 },
+        { label: "Venture capital / startups", idx: 312 },
+        { label: "Engineering / hardware", idx: 268 },
+        { label: "Premium watches",        idx: 224 },
+        { label: "Travel (international)", idx: 218 },
+      ],
+      coTopics: [
+        ["Tech / startups", 78], ["Venture capital", 41], ["Engineering / hardware", 38],
+        ["Premium watches", 36], ["Coffee", 32], ["Cycling", 28],
+        ["Travel / international", 26], ["Aviation (commercial)", 22],
+      ],
+      geo: [["California", 32.4], ["NY metro", 16.8], ["Washington", 9.4], ["Texas", 7.6], ["Massachusetts", 6.2]],
+      useCases: [
+        "<strong>F1 sponsorship — tech brands</strong> — Oracle, AWS, IBM have proven engagement here.",
+        "<strong>Premium tech consumer</strong> — Bose, Apple, Sonos audience-fit signal.",
+        "<strong>Engineering recruiting</strong> — F1 partner teams source talent from this pool.",
+      ],
+    },
+    {
+      id: "european_purists",
+      name: "European Purists",
+      desc: "WEC and Le Mans fans whose stream skews toward European motorsport history, hypercars, and France/Italy travel.",
+      size: 18420,
+      tags: ["WEC × Hypercars", "Le Mans heritage"],
+      stripDemo: { age: "35-44", gender: "M 74%", lifestage: "78% travelers" },
+      stats: [
+        { label: "Distinct authors", value: "18,420", delta: "4.5% of seed audience" },
+        { label: "Avg posts / month", value: "5.4", delta: "Niche but engaged" },
+        { label: "Top platform", value: "Bluesky", delta: "52% of pool" },
+        { label: "Engagement rate", value: "3.8%", delta: "Discussion-heavy" },
+      ],
+      age: [["18-24", 8], ["25-34", 22], ["35-44", 32], ["45-54", 24], ["55-64", 11], ["65+", 3]],
+      gender: { male: 74, female: 24, other: 2 },
+      lifeStage: [
+        { label: "Frequent international travelers", pct: 78, idx: 524 },
+        { label: "College+ educated",             pct: 84, idx: 172 },
+        { label: "Homeowners",                    pct: 64, idx: 128 },
+        { label: "Wine / fine dining enthusiasts", pct: 58, idx: 312 },
+        { label: "Luxury vehicle owners",         pct: 32, idx: 364 },
+      ],
+      interests: [
+        { label: "Le Mans / endurance",     idx: 524 },
+        { label: "European travel",         idx: 412 },
+        { label: "Hypercars (road)",        idx: 364 },
+        { label: "Premium watches",         idx: 286 },
+        { label: "Wine (French/Italian)",   idx: 264 },
+      ],
+      coTopics: [
+        ["Le Mans 24", 88], ["Porsche heritage", 62], ["Ferrari heritage", 58],
+        ["European motorsport history", 54], ["Travel / France", 41], ["Photography", 38],
+        ["Vintage racing", 32], ["Single malt / cognac", 24],
+      ],
+      geo: [["California", 18.4], ["NY metro", 16.2], ["Florida", 11.8], ["Illinois", 6.4], ["Washington", 4.6]],
+      useCases: [
+        "<strong>Hypercar OEMs</strong> — Porsche, Ferrari, Aston Martin, McLaren road programs.",
+        "<strong>Concours / vintage events</strong> — Pebble Beach, Amelia Island, Goodwood.",
+        "<strong>Luxury European travel</strong> — Le Mans race-week packages, Italian villa rentals.",
+      ],
+    },
+  ];
+
+  // =========================================================
+  // Render helpers
+  // =========================================================
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => n.toLocaleString();
+
+  function animateNumber(el, target) {
+    const start = parseInt(el.textContent.replace(/[^0-9]/g, ""), 10) || 0;
+    const duration = 500;
+    const t0 = performance.now();
+    el.classList.add("flash");
+    function tick(t) {
+      const k = Math.min(1, (t - t0) / duration);
+      const eased = 1 - Math.pow(1 - k, 3);
+      const v = Math.round(start + (target - start) * eased);
+      el.textContent = fmt(v);
+      if (k < 1) requestAnimationFrame(tick);
+      else { el.textContent = fmt(target); setTimeout(() => el.classList.remove("flash"), 300); }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function compute() {
+    const seed = $("seedSel").value;
+    const w = $("windowSel").value;
+    const minPosts = parseInt($("minPostsSel").value, 10);
+    const data = SEED_DATA[seed];
+    const windowMul = { "12m": 1.0, "6m": 0.55, "3m": 0.32, "30d": 0.12 }[w];
+    const activityMul = { 1: 1.0, 3: 0.23, 10: 0.05 }[minPosts] || 1;
+
+    animateNumber($("metricPosts"), Math.round(data.posts * windowMul));
+    animateNumber($("metricAuthors"), Math.round(data.authors * windowMul * activityMul));
+    animateNumber($("metricEngaged"), Math.round(data.engaged * windowMul));
+
+    const topPlatforms = [...data.platforms].sort((a, b) => b[1] - a[1]).slice(0, 2);
+    $("topPlatform").textContent = topPlatforms.map(([n, p]) => `${n} ${p}%`).join(" · ");
+    renderPlatformBars(data.platforms);
+
+    renderTreemap(data.treemap);
+    renderGeo(data.geo);
+    renderCadence(data.cadence);
+    renderAge(data);
+    renderGender(data);
+    renderLifeStage(data);
+    renderInterests(data);
+  }
+
+  function renderPlatformBars(platforms) {
+    const sorted = [...platforms].sort((a, b) => b[1] - a[1]);
+    $("platformBars").innerHTML = sorted.map(([name, pct], i) => {
+      const opacity = 1 - i * 0.22;
+      return `<div class="platform-seg active" style="flex: ${pct}; opacity: ${Math.max(opacity, 0.2)};"><span class="pseg-label">${name}</span></div>`;
+    }).join("");
+  }
+
+  function renderTreemap(items) {
+    const sorted = [...items].sort((a, b) => b.n - a.n);
+    $("treemap").innerHTML = sorted.map((item, idx) => {
+      let w, h;
+      if (idx === 0) { w = 6; h = 4; }
+      else if (idx === 1) { w = 6; h = 3; }
+      else if (idx <= 3) { w = 4; h = 2; }
+      else if (idx <= 6) { w = 4; h = 2; }
+      else if (idx <= 9) { w = 3; h = 2; }
+      else { w = 3; h = 1; }
+      return `
+        <div class="tm-cell" style="background: ${item.c}; grid-column: span ${w}; grid-row: span ${h};" onclick="alert('In production: filters the dashboard to authors who posted about both ${item.name} and the seed topic — ${fmt(item.n)} authors.')">
+          <div class="tm-name">${item.name}</div>
+          <div class="tm-count">${fmt(item.n)} authors</div>
+        </div>`;
+    }).join("");
+  }
+
+  function renderHeatmap() {
+    const cells = [];
+    cells.push(`<div class="hm-cell hm-header"></div>`);
+    MAKERS.forEach(m => cells.push(`<div class="hm-cell hm-header">${m}</div>`));
+    SERIES.forEach(s => {
+      cells.push(`<div class="hm-cell hm-header" style="text-align: right; padding-right: 12px;">${s}</div>`);
+      HEATMAP_DATA[s].forEach((val, j) => {
+        const bucket = val < 5 ? 0 : val < 15 ? 1 : val < 30 ? 2 : val < 45 ? 3 : val < 60 ? 4 : 5;
+        cells.push(`<div class="hm-cell hm-${bucket}" title="${s} fans posting about ${MAKERS[j]}: ${val}%" onclick="alert('In production: drills into the intersection of ${s} fans × ${MAKERS[j]} engagement.')">${val > 0 ? val + '%' : '·'}</div>`);
+      });
+    });
+    const heatmap = $("heatmap");
+    heatmap.style.gridTemplateColumns = `90px repeat(${MAKERS.length}, 1fr)`;
+    heatmap.innerHTML = cells.join("");
+  }
+
+  function renderGeo(rows) {
+    const max = rows[0][1];
+    $("geoBars").innerHTML = rows.map(([name, pct]) => {
+      const w = Math.round((pct / max) * 100);
+      return `
+        <div class="geo-row">
+          <div class="label">${name}</div>
+          <div class="geo-track"><div class="geo-fill" style="width: ${w}%;"></div></div>
+          <div class="num">${pct}%</div>
+        </div>`;
+    }).join("");
+  }
+
+  function renderCadence(weeks) {
+    const max = Math.max(...weeks);
+    $("cadence").innerHTML = weeks.map(v => {
+      const h = Math.max(4, Math.round((v / max) * 100));
+      return `<div class="cadence-bar" style="height: ${h}%;" title="${v} posts/wk avg"></div>`;
+    }).join("");
+  }
+
+  // ----- Demographic renderers -----
+  function renderAge(data) {
+    const max = Math.max(...data.age.map(a => a[1]));
+    const dominantBracket = data.age.reduce((a, b) => a[1] > b[1] ? a : b);
+    const skewYounger = data.age[0][1] + data.age[1][1];
+    const skewOlder = data.age[4][1] + data.age[5][1];
+
+    $("ageStats").innerHTML = `
+      <div class="stat-tile"><div class="label">Dominant bracket</div><div class="value">${dominantBracket[0]}</div><div class="delta">${dominantBracket[1]}% of audience</div></div>
+      <div class="stat-tile"><div class="label">25–44 share</div><div class="value">${data.age[1][1] + data.age[2][1]}%</div><div class="delta">Prime spending years</div></div>
+      <div class="stat-tile"><div class="label">Under-25 share</div><div class="value">${data.age[0][1]}%</div><div class="delta">Younger growth segment</div></div>
+      <div class="stat-tile"><div class="label">55+ share</div><div class="value">${skewOlder}%</div><div class="delta">Mature / wealth-stage</div></div>
+    `;
+
+    $("ageBars").innerHTML = data.age.map(([bracket, pct]) => {
+      const h = Math.round((pct / max) * 100);
+      return `<div class="vbar" style="height: ${h}%;"><div class="vbar-value-label">${pct}%</div></div>`;
+    }).join("");
+    $("ageAxis").innerHTML = data.age.map(a => `<div>${a[0]}</div>`).join("");
+  }
+
+  function renderGender(data) {
+    const g = data.gender;
+    $("genderBar").innerHTML = `
+      <div class="male" style="flex: ${g.male};">${g.male}%</div>
+      <div class="female" style="flex: ${g.female};">${g.female}%</div>
+      <div class="other" style="flex: ${g.other};">${g.other > 2 ? g.other + "%" : ""}</div>
+    `;
+    $("genderStats").innerHTML = `
+      <div class="gender-stat"><div class="swatch" style="background: var(--c-male);"></div><div><strong>${g.male}%</strong> male</div></div>
+      <div class="gender-stat"><div class="swatch" style="background: var(--c-female);"></div><div><strong>${g.female}%</strong> female</div></div>
+      <div class="gender-stat"><div class="swatch" style="background: var(--text-tertiary);"></div><div><strong>${g.other}%</strong> non-binary / undisclosed</div></div>
+      <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 8px; line-height: 1.5;">Index vs. all-sports baseline (M 60% / F 40%): male skew +${g.male - 60}pts.</div>
+    `;
+  }
+
+  function renderLifeStage(data) {
+    const max = Math.max(...data.lifeStage.map(l => l.idx));
+    $("lifeBars").innerHTML = data.lifeStage.map(item => {
+      const w = Math.round((item.idx / max) * 100);
+      return `
+        <div class="hbar-row">
+          <div class="label">${item.label}</div>
+          <div class="hbar-track"><div class="hbar-fill life" style="width: ${w}%;"></div></div>
+          <div class="num">${item.pct}% · idx ${item.idx}</div>
+        </div>`;
+    }).join("");
+  }
+
+  function renderInterests(data) {
+    const max = Math.max(...data.interests.map(i => i.idx));
+    $("interestBars").innerHTML = data.interests.map(item => {
+      const w = Math.round((item.idx / max) * 100);
+      return `
+        <div class="hbar-row">
+          <div class="label">${item.label}</div>
+          <div class="hbar-track"><div class="hbar-fill interest" style="width: ${w}%;"></div></div>
+          <div class="num">idx ${item.idx}</div>
+        </div>`;
+    }).join("");
+  }
+
+  function renderPools() {
+    $("pools").innerHTML = POOLS.map(p => `
+      <div class="pool-card" onclick="openPool('${p.id}')">
+        <div class="pool-name">${p.name}</div>
+        <div class="pool-desc">${p.desc}</div>
+        <div class="pool-size-label">Authors in pool</div>
+        <div class="pool-size">${fmt(p.size)}</div>
+        <div class="pool-tags">${p.tags.map(t => `<span class="ptag">${t}</span>`).join("")}</div>
+        <div class="pool-demo-strip">
+          <div class="pool-demo-cell">
+            <div class="demo-label">Age peak</div>
+            <div class="demo-value">${p.stripDemo.age}</div>
+          </div>
+          <div class="pool-demo-cell">
+            <div class="demo-label">Gender</div>
+            <div class="demo-value">${p.stripDemo.gender}</div>
+          </div>
+          <div class="pool-demo-cell">
+            <div class="demo-label">Life stage</div>
+            <div class="demo-value">${p.stripDemo.lifestage}</div>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // Modal renderers
+  function renderPoolAge(p) {
+    const max = Math.max(...p.age.map(a => a[1]));
+    return `
+      <div class="vbar-chart" style="height: 100px;">
+        ${p.age.map(([b, pct]) => {
+          const h = Math.round((pct / max) * 100);
+          return `<div class="vbar" style="height: ${h}%;" title="${b}: ${pct}%"></div>`;
+        }).join("")}
+      </div>
+      <div class="vbar-axis">
+        ${p.age.map(a => `<div>${a[0]}</div>`).join("")}
+      </div>`;
+  }
+
+  function renderPoolGender(p) {
+    return `
+      <div class="male" style="flex: ${p.gender.male};">${p.gender.male}%</div>
+      <div class="female" style="flex: ${p.gender.female};">${p.gender.female}%</div>
+      <div class="other" style="flex: ${p.gender.other};"></div>
+    `;
+  }
+
+  function renderPoolGenderStats(p) {
+    return `
+      <div class="gender-stat"><div class="swatch" style="background: var(--c-male);"></div><div><strong>${p.gender.male}%</strong> male</div></div>
+      <div class="gender-stat"><div class="swatch" style="background: var(--c-female);"></div><div><strong>${p.gender.female}%</strong> female</div></div>
+      <div class="gender-stat"><div class="swatch" style="background: var(--text-tertiary);"></div><div><strong>${p.gender.other}%</strong> non-binary / undisclosed</div></div>
+    `;
+  }
+
+  function renderPoolLife(p) {
+    const max = Math.max(...p.lifeStage.map(l => l.idx));
+    return p.lifeStage.map(item => {
+      const w = Math.round((item.idx / max) * 100);
+      return `
+        <div class="hbar-row" style="grid-template-columns: 1fr 80px 80px;">
+          <div class="label" style="font-size: 12px;">${item.label}</div>
+          <div class="hbar-track"><div class="hbar-fill life" style="width: ${w}%;"></div></div>
+          <div class="num">${item.pct}% · ${item.idx}</div>
+        </div>`;
+    }).join("");
+  }
+
+  function renderPoolInterests(p) {
+    const max = Math.max(...p.interests.map(i => i.idx));
+    return p.interests.map(item => {
+      const w = Math.round((item.idx / max) * 100);
+      return `
+        <div class="hbar-row" style="grid-template-columns: 1fr 80px 60px;">
+          <div class="label" style="font-size: 12px;">${item.label}</div>
+          <div class="hbar-track"><div class="hbar-fill interest" style="width: ${w}%;"></div></div>
+          <div class="num">idx ${item.idx}</div>
+        </div>`;
+    }).join("");
+  }
+
+  // Pool modal
+  window.openPool = function (id) {
+    const p = POOLS.find(x => x.id === id);
+    if (!p) return;
+    $("poolName").textContent = p.name;
+    $("poolSub").textContent = p.desc;
+
+    $("poolStats").innerHTML = p.stats.map(s => `
+      <div class="pool-stat">
+        <div class="label">${s.label}</div>
+        <div class="value">${s.value}</div>
+        <div class="delta">${s.delta}</div>
+      </div>`).join("");
+
+    $("poolAgeBars").innerHTML = renderPoolAge(p);
+    $("poolGenderBar").innerHTML = renderPoolGender(p);
+    $("poolGenderStats").innerHTML = renderPoolGenderStats(p);
+    $("poolLifeBars").innerHTML = renderPoolLife(p);
+    $("poolInterestBars").innerHTML = renderPoolInterests(p);
+
+    const maxCo = Math.max(...p.coTopics.map(c => c[1]));
+    $("poolCoTopics").innerHTML = p.coTopics.map(([name, pct]) => {
+      const w = Math.round((pct / maxCo) * 100);
+      return `
+        <div class="geo-row">
+          <div class="label">${name}</div>
+          <div class="geo-track"><div class="geo-fill" style="width: ${w}%;"></div></div>
+          <div class="num">${pct}%</div>
+        </div>`;
+    }).join("");
+
+    const maxGeo = p.geo[0][1];
+    $("poolGeo").innerHTML = p.geo.map(([name, pct]) => {
+      const w = Math.round((pct / maxGeo) * 100);
+      return `
+        <div class="geo-row">
+          <div class="label">${name}</div>
+          <div class="geo-track"><div class="geo-fill" style="width: ${w}%;"></div></div>
+          <div class="num">${pct}%</div>
+        </div>`;
+    }).join("");
+
+    $("poolUseCases").innerHTML = p.useCases.map(u => `<div style="margin-bottom: 8px;">• ${u}</div>`).join("");
+    $("modal").classList.add("open");
+  };
+
+  window.closeModal = function () { $("modal").classList.remove("open"); };
+
+  // Demographic tab switching
+  document.querySelectorAll(".demo-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".demo-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      const target = tab.dataset.demo;
+      document.querySelectorAll(".demo-panel-content").forEach(c => c.classList.remove("active"));
+      $(`demo-${target}`).classList.add("active");
+    });
+  });
+
+  // Wire up filters
+  $("runBtn").addEventListener("click", compute);
+  $("seedSel").addEventListener("change", compute);
+  $("windowSel").addEventListener("change", compute);
+  $("minPostsSel").addEventListener("change", compute);
+  $("geoSel").addEventListener("change", compute);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+  // Initial render
+  compute();
+  renderHeatmap();
+  renderPools();
+})();
+</script>
+
+</body>
+</html>

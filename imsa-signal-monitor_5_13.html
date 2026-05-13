@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prospector — IMSA YouTube Signal Monitor</title>
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg-page: #f8f7f3;
+    --bg-surface: #ffffff;
+    --bg-secondary: #f1f0ea;
+    --bg-tertiary: #e7e6df;
+    --text-primary: #18181a;
+    --text-secondary: #6a6a64;
+    --text-tertiary: #9c9b92;
+    --border-tertiary: rgba(0, 0, 0, 0.08);
+    --border-secondary: rgba(0, 0, 0, 0.18);
+    --accent-info: #185fa5;
+    --accent-info-bg: #e6f1fb;
+    --accent-warn-bg: #faeeda;
+    --accent-warn: #854f0b;
+    --accent-success: #3b6d11;
+    --accent-success-bg: #eaf3de;
+    --accent-purchase: #c47533;
+    --accent-purchase-bg: #fdeed7;
+    --c-core:        #2563a8;
+    --c-adjacent:    #5b8fc7;
+    --c-noise-golf:  #c47533;
+    --c-noise-news:  #9c5a6b;
+    --c-noise-life:  #888879;
+    --c-noise-other: #b8b8a8;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app { max-width: 1380px; margin: 0 auto; padding: 28px 32px 80px; }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 0.5px solid var(--border-tertiary);
+    margin-bottom: 24px;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-mark {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bg-page);
+    font-weight: 500; font-size: 14px;
+    letter-spacing: -0.02em;
+  }
+  .brand-text { line-height: 1.2; }
+  .brand-text .crumb { font-size: 12px; color: var(--text-secondary); letter-spacing: 0.02em; }
+  .brand-text .title { font-size: 18px; font-weight: 500; margin-top: 2px; }
+  .topbar-meta { display: flex; align-items: center; gap: 12px; }
+  .pill {
+    font-size: 12px; padding: 5px 12px; border-radius: 999px;
+    background: var(--accent-success-bg); color: var(--accent-success);
+    font-weight: 500;
+  }
+  .pill-muted { font-size: 12px; color: var(--text-tertiary); }
+
+  .layout { display: grid; grid-template-columns: 200px 1fr; gap: 32px; }
+  nav { position: sticky; top: 24px; height: fit-content; }
+  nav ul { list-style: none; padding: 0; margin: 0; }
+  nav li { margin-bottom: 2px; }
+  nav a {
+    display: block; padding: 8px 12px; border-radius: var(--radius-md);
+    font-size: 14px; color: var(--text-secondary); text-decoration: none;
+    cursor: pointer; transition: background 0.1s ease, color 0.1s ease;
+  }
+  nav a:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  nav a.active { background: var(--text-primary); color: var(--bg-page); }
+  nav .nav-section {
+    font-size: 11px; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 12px 12px 6px; margin-top: 8px;
+  }
+
+  /* Live banner */
+  .live-banner {
+    background: var(--accent-success-bg);
+    color: var(--accent-success);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    font-size: 12px;
+    margin-bottom: 22px;
+    display: flex; align-items: flex-start; gap: 12px;
+    line-height: 1.5;
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent-success); margin-top: 4px; flex-shrink: 0;
+    animation: pulse 2s infinite ease-in-out;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Headline strip */
+  .hero {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .hero-cell {
+    background: var(--bg-surface);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-cell::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--text-tertiary);
+  }
+  .hero-cell.h-total::before { background: var(--c-core); }
+  .hero-cell.h-core::before { background: var(--accent-info); }
+  .hero-cell.h-pi::before { background: var(--accent-purchase); }
+  .hero-cell.h-spike::before { background: #c63b3b; }
+  .hero-cell .label {
+    font-size: 12px; color: var(--text-secondary);
+    margin-bottom: 6px; font-weight: 500;
+  }
+  .hero-cell .value {
+    font-size: 28px; font-weight: 500;
+    line-height: 1.1; letter-spacing: -0.02em;
+  }
+  .hero-cell .delta {
+    font-size: 12px; color: var(--text-tertiary);
+    margin-top: 6px;
+  }
+
+  /* Purchase intent hero panel */
+  .pi-hero {
+    background: linear-gradient(135deg, #fdeed7 0%, #f7e2bd 100%);
+    border: 0.5px solid #e0b97f;
+    border-radius: var(--radius-lg);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .pi-hero::before {
+    content: "";
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(196, 117, 51, 0.12), transparent 70%);
+  }
+  .pi-hero h2 {
+    font-size: 17px; font-weight: 500;
+    margin: 0 0 4px;
+    color: #6a3a0d;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .pi-hero .pi-sub {
+    font-size: 12px; color: #8a5520;
+    margin-bottom: 18px;
+  }
+  .pi-hero-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1.5fr;
+    gap: 22px;
+    position: relative; z-index: 1;
+  }
+  .pi-number {
+    font-size: 64px; font-weight: 500;
+    line-height: 1; letter-spacing: -0.03em;
+    color: #6a3a0d;
+  }
+  .pi-number-sub {
+    font-size: 12px; color: #8a5520;
+    margin-top: 4px;
+  }
+  .pi-stats-list { display: flex; flex-direction: column; gap: 8px; }
+  .pi-stat {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0; border-bottom: 0.5px solid rgba(106, 58, 13, 0.12);
+    font-size: 13px;
+  }
+  .pi-stat:last-child { border-bottom: none; }
+  .pi-stat .v { font-weight: 500; color: #6a3a0d; font-variant-numeric: tabular-nums; }
+  .pi-keywords { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pi-kw {
+    background: rgba(196, 117, 51, 0.18);
+    color: #6a3a0d;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Panels */
+  .panel {
+    background: var(--bg-surface);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+  }
+  .panel h3 { font-size: 15px; font-weight: 500; margin: 0 0 4px; }
+  .panel .panel-sub {
+    font-size: 12px; color: var(--text-tertiary);
+    margin-bottom: 16px; line-height: 1.5;
+  }
+  .panel .footnote {
+    font-size: 11px; color: var(--text-tertiary);
+    margin-top: 14px; line-height: 1.5;
+  }
+  .panel-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px;
+  }
+
+  /* Signal quality stacked bar */
+  .sq-bar {
+    height: 32px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex;
+    box-shadow: inset 0 0 0 0.5px var(--border-tertiary);
+    margin-bottom: 12px;
+  }
+  .sq-seg {
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 11px; font-weight: 500;
+    transition: filter 0.15s ease;
+    cursor: default;
+  }
+  .sq-seg:hover { filter: brightness(1.1); }
+  .sq-legend { display: flex; flex-wrap: wrap; gap: 14px; }
+  .sq-leg-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px;
+  }
+  .sq-leg-item .swatch { width: 12px; height: 12px; border-radius: 3px; }
+  .sq-leg-item .lab { color: var(--text-primary); }
+  .sq-leg-item .ct { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+  /* Manufacturer table */
+  .mfr-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .mfr-table th {
+    text-align: left;
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+    padding: 8px 6px;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+  .mfr-table th.num { text-align: right; }
+  .mfr-table td {
+    padding: 10px 6px;
+    border-bottom: 0.5px solid var(--border-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+  .mfr-table td.num { text-align: right; }
+  .mfr-table tr:last-child td { border-bottom: none; }
+  .mfr-noise {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .mfr-noise.lo { background: var(--accent-success-bg); color: var(--accent-success); }
+  .mfr-noise.md { background: var(--accent-warn-bg); color: var(--accent-warn); }
+  .mfr-noise.hi { background: #f8e6e6; color: #842018; }
+  .mfr-bar-row {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 6px;
+    align-items: center;
+  }
+  .mfr-bars {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .mfr-bar-all, .mfr-bar-core {
+    height: 6px;
+    border-radius: 2px;
+  }
+  .mfr-bar-all { background: var(--bg-tertiary); }
+  .mfr-bar-core { background: var(--accent-info); }
+
+  /* Daily cadence chart */
+  .cadence-wrap { padding: 8px 4px 4px; }
+  .cadence {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 180px;
+    margin-bottom: 8px;
+  }
+  .cad-col {
+    flex: 1;
+    display: flex; flex-direction: column-reverse;
+    gap: 1px;
+    position: relative;
+    cursor: pointer;
+  }
+  .cad-seg {
+    border-radius: 2px;
+    transition: filter 0.15s ease;
+  }
+  .cad-seg.core { background: var(--accent-info); }
+  .cad-seg.noise { background: var(--bg-tertiary); }
+  .cad-col:hover .cad-seg { filter: brightness(1.1); }
+  .cad-col.spike .cad-seg.core { background: #c63b3b; }
+  .cad-col.spike::after {
+    content: "Laguna Seca →";
+    position: absolute;
+    top: -22px;
+    right: -10px;
+    font-size: 10px;
+    color: #c63b3b;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .cad-axis {
+    display: flex; gap: 6px;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+  .cad-axis > div { flex: 1; text-align: center; }
+  .cad-axis-month {
+    margin-top: 2px;
+    font-size: 10px;
+    color: var(--text-tertiary);
+  }
+
+  /* Video lists */
+  .video-list { display: flex; flex-direction: column; }
+  .video-row {
+    display: grid;
+    grid-template-columns: 1fr 50px;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 0.5px solid var(--border-tertiary);
+    font-size: 13px;
+    align-items: center;
+  }
+  .video-row:last-child { border-bottom: none; }
+  .video-title {
+    color: var(--text-primary);
+    line-height: 1.45;
+  }
+  .video-meta {
+    display: flex; gap: 6px; align-items: center;
+    margin-top: 4px;
+  }
+  .video-count {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  .video-class-badge {
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .vcb-golf { background: #fdeed7; color: #6a3a0d; }
+  .vcb-news { background: #f2dfe4; color: #6e3a4a; }
+  .vcb-life { background: var(--bg-secondary); color: var(--text-secondary); }
+  .vcb-other { background: var(--bg-secondary); color: var(--text-secondary); }
+
+  /* Sentiment / emotion strips */
+  .sent-bar {
+    height: 26px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex;
+    box-shadow: inset 0 0 0 0.5px var(--border-tertiary);
+    margin-bottom: 8px;
+  }
+  .sent-seg { color: white; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; }
+  .sent-seg.s-positive { background: var(--accent-success); }
+  .sent-seg.s-neutral  { background: var(--text-tertiary); }
+  .sent-seg.s-negative { background: #b94a4a; }
+  .sent-legend { display: flex; gap: 14px; font-size: 12px; }
+  .sent-legend .it { display: flex; gap: 6px; align-items: center; }
+  .sent-legend .sw { width: 10px; height: 10px; border-radius: 2px; }
+
+  .emo-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .emo-cell {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .emo-cell .e-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; }
+  .emo-cell .e-value { font-size: 16px; font-weight: 500; }
+
+  /* Rule breakdown */
+  .rule-list { display: flex; flex-direction: column; gap: 8px; }
+  .rule-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 56px;
+    align-items: center;
+    gap: 12px;
+  }
+  .rule-name { font-size: 13px; color: var(--text-primary); }
+  .rule-track {
+    height: 8px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .rule-fill {
+    height: 100%;
+    background: var(--accent-info);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .rule-fill.pi { background: var(--accent-purchase); }
+  .rule-count {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tooltip on cadence hover */
+  .tooltip {
+    position: fixed;
+    background: rgba(20, 20, 20, 0.95);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 100;
+    display: none;
+    line-height: 1.5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .tooltip.show { display: block; }
+  .tooltip .tt-title { font-weight: 500; margin-bottom: 4px; }
+  .tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; }
+  .tooltip .tt-row .v { font-variant-numeric: tabular-nums; }
+
+  /* Action row */
+  button.secondary {
+    height: 36px;
+    padding: 0 14px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.1s ease;
+  }
+  .actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  button.secondary:hover { background: var(--bg-secondary); }
+
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; }
+    nav { position: static; }
+    nav ul { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav-section { display: none; }
+    .hero, .pi-hero-grid { grid-template-columns: 1fr 1fr; }
+    .panel-row { grid-template-columns: 1fr; }
+    .emo-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="tooltip" id="tooltip"></div>
+
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">P</div>
+      <div class="brand-text">
+        <div class="crumb">Prospector › Signal Monitor</div>
+        <div class="title">IMSA · YouTube · April 29 – May 13, 2026</div>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <span class="pill">Live data</span>
+      <span class="pill-muted">15-day window · 11 active rules · YouTube only</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <nav>
+      <ul>
+        <li><a class="active">IMSA YouTube</a></li>
+        <li><a>IMSA Bluesky <span style="opacity: 0.5;">(soon)</span></a></li>
+        <li><a>IMSA X / Twitter <span style="opacity: 0.5;">(soon)</span></a></li>
+        <li><a>+ New seed</a></li>
+      </ul>
+      <div class="nav-section">Views</div>
+      <ul>
+        <li><a class="active">Signal monitor</a></li>
+        <li><a>Audience atlas</a></li>
+        <li><a>People (resolved)</a></li>
+      </ul>
+      <div class="nav-section">Tools</div>
+      <ul>
+        <li><a>Rule editor</a></li>
+        <li><a>Export</a></li>
+      </ul>
+    </nav>
+
+    <main>
+
+      <div class="live-banner">
+        <span class="live-dot"></span>
+        <div>
+          Live signal from <strong>11 active YouTube harvester rules</strong> running against IMSA-relevant
+          keywords. 1,654 rows in the last 15 days. Showing raw volume alongside on-topic-filtered numbers
+          so you can see what's signal and what's noise.
+        </div>
+      </div>
+
+      <!-- Hero metrics -->
+      <div class="hero">
+        <div class="hero-cell h-total">
+          <div class="label">Total rows ingested</div>
+          <div class="value">1,654</div>
+          <div class="delta">15 days · 110 rows/day avg</div>
+        </div>
+        <div class="hero-cell h-core">
+          <div class="label">On-topic (racing core)</div>
+          <div class="value">518</div>
+          <div class="delta">31.3% of total · the addressable signal</div>
+        </div>
+        <div class="hero-cell h-pi">
+          <div class="label">Purchase-intent matches</div>
+          <div class="value">45</div>
+          <div class="delta">2.7% · highest commercial value</div>
+        </div>
+        <div class="hero-cell h-spike">
+          <div class="label">Peak day volume</div>
+          <div class="value">424</div>
+          <div class="delta">May 3 · Laguna Seca race weekend</div>
+        </div>
+      </div>
+
+      <!-- Purchase intent hero -->
+      <div class="pi-hero">
+        <h2>
+          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #c47533;"></span>
+          Purchase intent — highest-value signal for sponsorship
+        </h2>
+        <div class="pi-sub">Comments using buy / purchase / considering / interested language while engaging with car content. Direct commercial relevance for OEM and dealer sponsors.</div>
+        <div class="pi-hero-grid">
+          <div>
+            <div class="pi-number">45</div>
+            <div class="pi-number-sub">purchase-intent matches across 15 days</div>
+          </div>
+          <div class="pi-stats-list">
+            <div class="pi-stat"><span>Top day</span><span class="v">May 12 · 11 matches</span></div>
+            <div class="pi-stat"><span>Avg / day</span><span class="v">3.0</span></div>
+            <div class="pi-stat"><span>Annualized</span><span class="v">~1,100</span></div>
+            <div class="pi-stat"><span>Cost per signal</span><span class="v" style="color: var(--accent-success);">$0</span></div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: #8a5520; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; font-weight: 500;">Intent keywords triggered</div>
+            <div class="pi-keywords">
+              <span class="pi-kw">buy · 18</span>
+              <span class="pi-kw">buying · 12</span>
+              <span class="pi-kw">considering · 9</span>
+              <span class="pi-kw">interested · 5</span>
+              <span class="pi-kw">purchase · 1</span>
+            </div>
+            <div style="font-size: 11px; color: #8a5520; margin-top: 10px;">
+              Sentiment split: <strong>22 neutral · 19 negative · 4 positive.</strong> Even negative-sentiment purchase intent is commercially actionable (consumer comparison shopping).
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily cadence -->
+      <div class="panel" style="margin-bottom: 22px;">
+        <h3>Daily volume — total vs on-topic</h3>
+        <div class="panel-sub">Light bars are total ingest (1,654). Dark bars are on-topic racing-core signal (518). The May 3 spike tracks the IMSA Laguna Seca race weekend.</div>
+        <div class="cadence-wrap">
+          <div class="cadence" id="cadence"></div>
+          <div class="cad-axis" id="cadAxis"></div>
+        </div>
+        <div class="footnote">Hover any bar for breakdown. Purchase-intent counts are layered separately in tooltip detail.</div>
+      </div>
+
+      <!-- Signal quality breakdown -->
+      <div class="panel" style="margin-bottom: 22px;">
+        <h3>Signal quality — what's actually IMSA-relevant</h3>
+        <div class="panel-sub">Of 1,654 raw rows, only 31.3% come from videos that are actually about racing. The rest are off-topic videos where commenters happened to mention an IMSA-tracked keyword. Honest pitch: this is the filtering layer that turns harvested signal into sponsorship-quality audience data.</div>
+        <div class="sq-bar" id="sqBar"></div>
+        <div class="sq-legend" id="sqLegend"></div>
+        <div class="footnote">Cadillac is mentioned 271 times across all rows but only 7 of those are from actual racing videos — the rest are mostly from the PGA Tour Cadillac Championship coverage. Without filtering, raw counts are misleading.</div>
+      </div>
+
+      <!-- Manufacturer table -->
+      <div class="panel" style="margin-bottom: 22px;">
+        <h3>Manufacturer mentions — raw vs filtered</h3>
+        <div class="panel-sub">The most-mentioned manufacturers across the 15-day window, comparing raw counts (all videos) against the filtered count (racing-core only). The "noise %" column shows how much of each manufacturer's signal comes from off-topic content.</div>
+        <table class="mfr-table">
+          <thead>
+            <tr>
+              <th>Manufacturer</th>
+              <th class="num">All rows</th>
+              <th class="num">Racing-core</th>
+              <th class="num">Noise %</th>
+              <th>Signal share</th>
+            </tr>
+          </thead>
+          <tbody id="mfrBody"></tbody>
+        </table>
+        <div class="footnote">
+          Acura's 100% signal purity (64/64) is the cleanest result in the data — driven by the
+          Honda/Acura GTP-exit news cycle during this window. Lexus RC F dominates raw counts but
+          most of its signal is incidental. <strong>For sponsorship value, look at the Racing-core column.</strong>
+        </div>
+      </div>
+
+      <!-- Top videos -->
+      <div class="panel-row">
+        <div class="panel">
+          <h3>Top racing-core videos</h3>
+          <div class="panel-sub">YouTube videos generating the most on-topic IMSA-relevant comments.</div>
+          <div class="video-list" id="coreVideos"></div>
+        </div>
+        <div class="panel">
+          <h3>Top noise videos</h3>
+          <div class="panel-sub">Off-topic videos that triggered the harvester. Useful for tuning the rule set.</div>
+          <div class="video-list" id="noiseVideos"></div>
+        </div>
+      </div>
+
+      <!-- Sentiment / emotion -->
+      <div class="panel" style="margin-bottom: 22px; margin-top: 22px;">
+        <h3>Sentiment & emotion (racing-core only)</h3>
+        <div class="panel-sub">LUX sentiment classification on the 518 on-topic comments. YouTube comments skew negative as a medium — this is normal, not a red flag.</div>
+        <div class="sent-bar" id="sentBar"></div>
+        <div class="sent-legend" id="sentLegend"></div>
+        <div style="margin-top: 16px; font-size: 12px; color: var(--text-secondary);">Emotion distribution (LUX classifier):</div>
+        <div class="emo-grid" id="emoGrid"></div>
+      </div>
+
+      <!-- Active rules -->
+      <div class="panel">
+        <h3>Active harvester rules</h3>
+        <div class="panel-sub">11 rules running against YouTube. Volume each rule contributed in the 15-day window. The "Purchase Intent" rule is the highest-value-per-row signal even though it's not the highest-volume.</div>
+        <div class="rule-list" id="ruleList"></div>
+        <div class="actions">
+          <button class="secondary" onclick="alert('In production: opens the rule editor — adjust keywords, thresholds, and scope. Live preview shows how many rows the change would have produced over the historical window.')">⚙ Edit rules</button>
+          <button class="secondary" onclick="alert('In production: exports the filtered racing-core rows as CSV with sentiment, video metadata, and keyword matches for downstream analysis.')">↓ Export racing-core rows</button>
+          <button class="secondary" onclick="alert('In production: pushes the 45 purchase-intent rows to the People resolution layer — these become the priority candidates for outreach or audience targeting.')">→ Send purchase-intent to People</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  // === Real data (April 29 – May 13, 2026) ===
+  const DAILY = [
+    { date: "Apr 29", total:  26, core:   6, pi: 4 },
+    { date: "Apr 30", total:  95, core:  12, pi: 8 },
+    { date: "May 1",  total:  73, core:  27, pi: 1 },
+    { date: "May 2",  total: 327, core:  85, pi: 5 },
+    { date: "May 3",  total: 424, core: 143, pi: 1, spike: true },
+    { date: "May 4",  total: 160, core:  74, pi: 3 },
+    { date: "May 5",  total:  76, core:  33, pi: 0 },
+    { date: "May 6",  total:  55, core:   8, pi: 6 },
+    { date: "May 7",  total:  82, core:  10, pi: 2 },
+    { date: "May 8",  total:  60, core:  27, pi: 0 },
+    { date: "May 9",  total:  41, core:  17, pi: 2 },
+    { date: "May 10", total:  57, core:   9, pi: 0 },
+    { date: "May 11", total:  73, core:  42, pi: 2 },
+    { date: "May 12", total:  90, core:  15, pi: 11 },
+    { date: "May 13", total:  15, core:  10, pi: 0 },
+  ];
+
+  const SIGNAL_QUALITY = [
+    { key: "racing_core",    label: "Racing core",      count: 518, color: "var(--c-core)",        note: "Actual IMSA/racing content" },
+    { key: "auto_adjacent",  label: "Auto adjacent",    count:  28, color: "var(--c-adjacent)",    note: "Cars but not racing" },
+    { key: "noise_golf",     label: "Noise · golf",     count: 299, color: "var(--c-noise-golf)",  note: "PGA Cadillac Championship" },
+    { key: "noise_news",     label: "Noise · news",     count: 344, color: "var(--c-noise-news)",  note: "Political / tech / news" },
+    { key: "noise_lifestyle",label: "Noise · lifestyle",count:  65, color: "var(--c-noise-life)",  note: "Running, kayak, sneakers" },
+    { key: "noise_other",    label: "Noise · other",    count: 400, color: "var(--c-noise-other)", note: "Other off-topic content" },
+  ];
+
+  const MFRS = [
+    { name: "Acura",        all:  64, core: 64, noise: 0.0 },
+    { name: "Porsche",      all:  53, core: 50, noise: 5.7 },
+    { name: "Lexus RC F",   all: 363, core: 49, noise: 86.5 },
+    { name: "Porsche 911",  all:  63, core: 43, noise: 31.7 },
+    { name: "Chevy",        all:  67, core: 30, noise: 55.2 },
+    { name: "Chevrolet",    all:  19, core: 13, noise: 31.6 },
+    { name: "BMW",          all:  46, core: 11, noise: 76.1 },
+    { name: "BMW M4",       all:  46, core: 11, noise: 76.1 },
+    { name: "Lamborghini",  all:  13, core:  9, noise: 30.8 },
+    { name: "Cadillac",     all: 271, core:  7, noise: 97.4 },
+    { name: "Aston Martin", all:  32, core:  7, noise: 78.1 },
+    { name: "Ferrari",      all:   9, core:  6, noise: 33.3 },
+    { name: "GT3",          all:  13, core:  6, noise: 53.8 },
+    { name: "Mustang",      all:   7, core:  4, noise: 42.9 },
+    { name: "Corvette",     all:   3, core:  2, noise: 33.3 },
+    { name: "Mercedes AMG", all:   3, core:  1, noise: 66.7 },
+  ];
+
+  const CORE_VIDEOS = [
+    { title: "Estre Pulling Off The Impossible Slingshot #porsche #motorsport", n: 79 },
+    { title: "Honda Explains GTP Exit – Acura IndyCar Move – Indy 500 Entries", n: 73 },
+    { title: "WeatherTech Championship 2026: Laguna Seca | IMSA EXTENDED HIGHLIGHTS | Motorsports on NBC", n: 56 },
+    { title: "2026 IMSA Monterey SportsCar Championship | WeatherTech Championship | Monterey, California", n: 35 },
+    { title: "NASCAR Craftsman Truck Series Highlights | 2026 Texas Motor Speedway", n: 18 },
+    { title: "RIP Alex Zanardi", n: 14 },
+    { title: "NASCAR Cup Series Highlights | 2026 Texas Motor Speedway", n: 12 },
+    { title: "Double Overtakes in Motorsport That Look Unreal 🏎️💨", n: 12 },
+    { title: "Why Would NASCAR Change Its Best Series?", n: 11 },
+    { title: "What's Cleetus McFarland's Impact On NASCAR?", n: 11 },
+    { title: "Every Engine BANNED From Motorsport — Explained", n: 10 },
+  ];
+
+  const NOISE_VIDEOS = [
+    { title: "Unique ruling as leader Cam Young calls penalty on himself | Cadillac Championship | 2026", n: 172, cls: "golf" },
+    { title: "Every shot from Cameron Young's wire-to-wire win | Cadillac Championship | 2026",            n:  50, cls: "golf" },
+    { title: "Apple's NEW Ultra Lineup is INSANE… Here's What's Coming",                                   n:  43, cls: "news" },
+    { title: "Stephen Miller: We must CONDEMN this",                                                       n:  36, cls: "news" },
+    { title: "How is a depleted Iran damaging so many US bases? A CNN investigation",                      n:  31, cls: "news" },
+    { title: "A HISTORIC MARATHON WORLD RECORD!!! || The 2026 London Marathon Was ABSOLUTELY INSANE",      n:  24, cls: "life" },
+    { title: "On The Range from the Cadillac Championship | 2026",                                         n:  24, cls: "golf" },
+    { title: "I Impersonated Jon Rahm (Jon Rahmen)",                                                       n:  23, cls: "golf" },
+    { title: "Biohacker Bryan Johnson trusts AI will solve human aging",                                   n:  18, cls: "news" },
+    { title: "'MISERABLE': Lawmaker issues warning on indoctrination",                                     n:  18, cls: "news" },
+  ];
+
+  const CORE_SENTIMENT = { positive: 55, neutral: 332, negative: 131, total: 518 };
+  const CORE_EMOTION = [
+    { label: "Neutral", v: 350 },
+    { label: "Sadness", v: 82  },
+    { label: "Anger",   v: 31  },
+    { label: "Joy",     v: 30  },
+    { label: "Fear",    v: 21  },
+    { label: "Disgust", v: 4   },
+    { label: "Surprise",v: 0   },
+  ];
+
+  const RULES = [
+    { name: "GT Manufacturer (keywords)",     count: 556 },
+    { name: "Prototype Manufacturer (keywords)", count: 420 },
+    { name: "IMSA — Post",                    count: 297 },
+    { name: "IMSA — Comment",                 count: 200 },
+    { name: "IMSA Races (watchlist)",         count: 144 },
+    { name: "GT Manufacturer (comments)",     count:  77 },
+    { name: "Prototype Mfr (comments)",       count:  46 },
+    { name: "Auto Purchase Intent",           count:  45, pi: true },
+    { name: "Prototype Mfr (hashtags)",       count:   7 },
+    { name: "IMSA Drivers",                   count:   6 },
+    { name: "GT Mfr (hashtags)",              count:   6 },
+  ];
+
+  // === Renderers ===
+
+  function fmt(n) { return n.toLocaleString(); }
+
+  // Cadence with tooltip
+  function renderCadence() {
+    const cad = document.getElementById("cadence");
+    const axis = document.getElementById("cadAxis");
+    const maxTotal = Math.max(...DAILY.map(d => d.total));
+    const tooltip = document.getElementById("tooltip");
+
+    cad.innerHTML = DAILY.map((d, i) => {
+      const totalH = Math.round((d.total / maxTotal) * 100);
+      const coreH = Math.round((d.core / maxTotal) * 100);
+      const noiseH = totalH - coreH;
+      return `
+        <div class="cad-col ${d.spike ? 'spike' : ''}" data-idx="${i}">
+          <div class="cad-seg core" style="height: ${coreH}%;"></div>
+          <div class="cad-seg noise" style="height: ${noiseH}%;"></div>
+        </div>`;
+    }).join("");
+
+    axis.innerHTML = DAILY.map(d => `<div>${d.date}</div>`).join("");
+
+    cad.querySelectorAll(".cad-col").forEach(col => {
+      col.addEventListener("mouseenter", e => {
+        const i = parseInt(col.dataset.idx, 10);
+        const d = DAILY[i];
+        tooltip.innerHTML = `
+          <div class="tt-title">${d.date}</div>
+          <div class="tt-row"><span>Total:</span><span class="v">${d.total}</span></div>
+          <div class="tt-row"><span>Racing core:</span><span class="v">${d.core}</span></div>
+          <div class="tt-row"><span>Purchase intent:</span><span class="v">${d.pi}</span></div>
+          <div class="tt-row"><span>Noise:</span><span class="v">${d.total - d.core}</span></div>`;
+        tooltip.classList.add("show");
+      });
+      col.addEventListener("mousemove", e => {
+        tooltip.style.left = (e.clientX + 14) + "px";
+        tooltip.style.top = (e.clientY + 14) + "px";
+      });
+      col.addEventListener("mouseleave", () => tooltip.classList.remove("show"));
+    });
+  }
+
+  // Signal quality bar
+  function renderSignalQuality() {
+    const total = SIGNAL_QUALITY.reduce((s, x) => s + x.count, 0);
+    document.getElementById("sqBar").innerHTML = SIGNAL_QUALITY.map(s => {
+      const pct = (s.count / total) * 100;
+      const showLabel = pct > 6 ? `${Math.round(pct)}%` : '';
+      return `<div class="sq-seg" style="flex: ${s.count}; background: ${s.color};" title="${s.label}: ${s.count} (${pct.toFixed(1)}%)">${showLabel}</div>`;
+    }).join("");
+
+    document.getElementById("sqLegend").innerHTML = SIGNAL_QUALITY.map(s => `
+      <div class="sq-leg-item">
+        <div class="swatch" style="background: ${s.color};"></div>
+        <span class="lab">${s.label}</span>
+        <span class="ct">${s.count} · ${(s.count/total*100).toFixed(1)}%</span>
+      </div>`).join("");
+  }
+
+  // Manufacturer table
+  function renderMfrTable() {
+    const maxAll = Math.max(...MFRS.map(m => m.all));
+    document.getElementById("mfrBody").innerHTML = MFRS.map(m => {
+      const noiseClass = m.noise < 25 ? "lo" : m.noise < 65 ? "md" : "hi";
+      const allW = (m.all / maxAll) * 100;
+      const coreW = (m.core / maxAll) * 100;
+      return `
+        <tr>
+          <td><strong>${m.name}</strong></td>
+          <td class="num">${m.all}</td>
+          <td class="num"><strong>${m.core}</strong></td>
+          <td class="num"><span class="mfr-noise ${noiseClass}">${m.noise.toFixed(0)}%</span></td>
+          <td>
+            <div class="mfr-bars">
+              <div class="mfr-bar-all" style="width: ${allW}%;" title="All rows: ${m.all}"></div>
+              <div class="mfr-bar-core" style="width: ${coreW}%;" title="Racing-core: ${m.core}"></div>
+            </div>
+          </td>
+        </tr>`;
+    }).join("");
+  }
+
+  // Video lists
+  function renderVideoList(elId, videos, isNoise) {
+    const max = Math.max(...videos.map(v => v.n));
+    document.getElementById(elId).innerHTML = videos.map(v => {
+      const badge = isNoise ? `<span class="video-class-badge vcb-${v.cls}">${v.cls}</span>` : "";
+      return `
+        <div class="video-row">
+          <div>
+            <div class="video-title">${v.title}</div>
+            ${isNoise ? `<div class="video-meta">${badge}</div>` : ""}
+          </div>
+          <div class="video-count">${v.n}</div>
+        </div>`;
+    }).join("");
+  }
+
+  // Sentiment bar
+  function renderSentiment() {
+    const s = CORE_SENTIMENT;
+    document.getElementById("sentBar").innerHTML = `
+      <div class="sent-seg s-positive" style="flex: ${s.positive};">${(s.positive/s.total*100).toFixed(0)}%</div>
+      <div class="sent-seg s-neutral"  style="flex: ${s.neutral};" >${(s.neutral/s.total*100).toFixed(0)}%</div>
+      <div class="sent-seg s-negative" style="flex: ${s.negative};">${(s.negative/s.total*100).toFixed(0)}%</div>`;
+    document.getElementById("sentLegend").innerHTML = `
+      <div class="it"><div class="sw" style="background: var(--accent-success);"></div><span><strong>${s.positive}</strong> positive</span></div>
+      <div class="it"><div class="sw" style="background: var(--text-tertiary);"></div><span><strong>${s.neutral}</strong> neutral</span></div>
+      <div class="it"><div class="sw" style="background: #b94a4a;"></div><span><strong>${s.negative}</strong> negative</span></div>`;
+  }
+
+  // Emotion grid
+  function renderEmotion() {
+    document.getElementById("emoGrid").innerHTML = CORE_EMOTION.map(e => `
+      <div class="emo-cell">
+        <div class="e-label">${e.label}</div>
+        <div class="e-value">${e.v}</div>
+      </div>`).join("");
+  }
+
+  // Rule list
+  function renderRules() {
+    const max = Math.max(...RULES.map(r => r.count));
+    document.getElementById("ruleList").innerHTML = RULES.map(r => {
+      const w = (r.count / max) * 100;
+      const cls = r.pi ? "rule-fill pi" : "rule-fill";
+      return `
+        <div class="rule-row">
+          <div class="rule-name">${r.name}${r.pi ? ' <span style="color: var(--accent-purchase); font-size: 11px; font-weight: 500;">· hero</span>' : ''}</div>
+          <div class="rule-track"><div class="${cls}" style="width: ${w}%;"></div></div>
+          <div class="rule-count">${r.count}</div>
+        </div>`;
+    }).join("");
+  }
+
+  // Init
+  renderCadence();
+  renderSignalQuality();
+  renderMfrTable();
+  renderVideoList("coreVideos", CORE_VIDEOS, false);
+  renderVideoList("noiseVideos", NOISE_VIDEOS, true);
+  renderSentiment();
+  renderEmotion();
+  renderRules();
+})();
+</script>
+
+</body>
+</html>

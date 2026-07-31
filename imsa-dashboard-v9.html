@@ -1,0 +1,4042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Prospector / IMSA — Audience Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --orange:        #FF4500;
+    --orange-2:      #E63900;
+    --orange-soft:   #FFE5DC;
+    --orange-faint:  #FFF1EB;
+    --black:         #0A0A0A;
+    --black-2:       #1A1A1A;
+    --grey-1:        #2E2E2E;
+    --grey-2:        #555555;
+    --grey-3:        #8A8A8A;
+    --grey-4:        #B8B8B8;
+    --grey-5:        #E5E5E5;
+    --grey-6:        #F2F2F2;
+    --white:         #FFFFFF;
+    --paper:         #FAFAFA;
+    --sponsor:       #0A0A0A;
+    --imsa:          #FF4500;
+    --both:          #555555;
+    --future:        #6B5BA0;
+    --future-bg:     #F0EDF7;
+    --future-soft:   #F7F5FB;
+    --pos:           #1F9D55;
+    --neu:           #8A8A8A;
+    --neg:           #DC3545;
+  }
+
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--paper);
+    color: var(--black);
+    font-size: 13px;
+    line-height: 1.45;
+    font-feature-settings: "cv11", "ss01", "ss03";
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: "JetBrains Mono", "Courier New", monospace; }
+
+  .app {
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 24px 32px 80px;
+  }
+
+  /* ============================================================
+     MASTHEAD
+     ============================================================ */
+  .masthead {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: end;
+    gap: 28px;
+    padding-bottom: 16px;
+    border-bottom: 3px solid var(--black);
+    margin-bottom: 18px;
+  }
+  .brand-lockup { display: flex; align-items: center; gap: 14px; }
+  .brand-square {
+    width: 44px; height: 44px;
+    background: var(--orange); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 22px; letter-spacing: -0.04em; line-height: 1;
+  }
+  .brand-text-stack { line-height: 1; }
+  .brand-mark {
+    font-size: 9px; font-weight: 800; letter-spacing: 0.22em;
+    color: var(--grey-2); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .brand-mark .accent { color: var(--orange); }
+  .masthead-title {
+    font-size: 32px; font-weight: 800; line-height: 0.95;
+    letter-spacing: -0.025em; color: var(--black);
+  }
+  .masthead-title .small {
+    display: block; font-size: 13px; font-weight: 500;
+    color: var(--grey-2); margin-top: 6px; letter-spacing: -0.005em;
+  }
+  .masthead-meta {
+    text-align: right;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    color: var(--grey-2); text-transform: uppercase; line-height: 1.7;
+  }
+  .masthead-meta strong { color: var(--black); font-weight: 800; }
+  .pulse {
+    display: inline-block; width: 8px; height: 8px;
+    background: var(--orange); border-radius: 50%;
+    margin-right: 6px; vertical-align: middle;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ============================================================
+     TOP NAV
+     ============================================================ */
+  .topnav {
+    display: flex;
+    gap: 0;
+    border-top: 2px solid var(--black);
+    border-bottom: 2px solid var(--black);
+    background: var(--white);
+    margin-bottom: 20px;
+  }
+  .topnav button {
+    flex: 1;
+    padding: 12px 10px 14px;
+    border: none;
+    background: transparent;
+    border-right: 1px solid var(--grey-5);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--grey-2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.12s ease;
+    position: relative;
+  }
+  .topnav button:last-child { border-right: none; }
+  .topnav button:hover { color: var(--black); background: var(--grey-6); }
+  .topnav button.active {
+    background: var(--black);
+    color: var(--white);
+  }
+  .topnav button.active::after {
+    content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px;
+    background: var(--orange);
+  }
+  .topnav .nav-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    font-weight: 700;
+    opacity: 0.6;
+  }
+  .topnav .nav-ch {
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+  }
+  .nav-ch.sponsor { background: var(--white); color: var(--black); }
+  .nav-ch.imsa { background: var(--orange); color: var(--white); }
+  .nav-ch.both { background: var(--grey-2); color: var(--white); }
+  .topnav button.active .nav-ch.sponsor { background: var(--white); color: var(--black); }
+  .topnav button.active .nav-ch.both { background: var(--white); color: var(--black); }
+
+  .view { display: none; animation: fadeIn 0.18s ease-out; }
+  .view.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ============================================================
+     VIEW HEADER
+     ============================================================ */
+  .view-header {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 24px;
+    background: var(--white);
+    padding: 22px 26px;
+    border: 2px solid var(--black);
+    margin-bottom: 16px;
+  }
+  .view-header.sponsor { border-color: var(--black); }
+  .view-header.imsa { border-color: var(--orange); }
+  .view-header.both { border-color: var(--grey-1); }
+  .view-header-tag-stack { display: flex; flex-direction: column; gap: 8px; }
+  .view-header-pill {
+    background: var(--black); color: var(--white);
+    padding: 4px 10px; font-size: 9px; font-weight: 800;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    align-self: flex-start;
+  }
+  .view-header-pill.imsa { background: var(--orange); }
+  .view-header-pill.both { background: var(--grey-2); }
+  .view-header-label {
+    font-size: 18px; font-weight: 800; color: var(--black);
+    letter-spacing: -0.02em; line-height: 1.05;
+  }
+  .view-header-body {
+    font-size: 15px; font-weight: 400;
+    line-height: 1.45; color: var(--black);
+  }
+  .view-header-body strong { font-weight: 700; }
+
+  /* ============================================================
+     POST-POC / GAPS CALLOUT
+     ============================================================ */
+  .gaps-callout {
+    background: var(--future-bg);
+    border-left: 4px solid var(--future);
+    padding: 12px 18px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--black);
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+  .gaps-callout:hover { background: var(--future-soft); }
+  .gaps-callout-tag {
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    font-size: 9px;
+    color: var(--future);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .gaps-callout-body strong { font-weight: 800; color: var(--future); }
+
+  /* ============================================================
+     BRAND PICKER (Brand view)
+     ============================================================ */
+  .brand-picker {
+    display: flex;
+    border: 2px solid var(--black);
+    background: var(--white);
+    margin-bottom: 16px;
+    overflow-x: auto;
+  }
+  .brand-picker button {
+    flex: 1;
+    padding: 14px 16px 16px;
+    border: none;
+    border-right: 1px solid var(--grey-5);
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--grey-2);
+    cursor: pointer;
+    display: flex; align-items: baseline; justify-content: center; gap: 8px;
+    transition: all 0.12s ease;
+    white-space: nowrap;
+  }
+  .brand-picker button:last-child { border-right: none; }
+  .brand-picker button:hover { background: var(--grey-6); color: var(--black); }
+  .brand-picker button .n {
+    font-size: 11px; font-weight: 700;
+    color: var(--grey-3); background: var(--grey-6);
+    padding: 2px 7px;
+  }
+  .brand-picker button.active { background: var(--black); color: var(--white); }
+  .brand-picker button.active .n { background: var(--orange); color: var(--white); }
+
+  /* ============================================================
+     HERO KPI ROW
+     ============================================================ */
+  .hero {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 2px solid var(--black);
+    background: var(--white);
+    margin-bottom: 16px;
+  }
+  .hero-cell {
+    padding: 22px 22px;
+    border-right: 1px solid var(--grey-5);
+    position: relative;
+  }
+  .hero-cell:last-child { border-right: none; }
+  .hero-cell .label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--grey-2);
+    margin-bottom: 12px;
+  }
+  .hero-cell .value {
+    font-size: 60px;
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    color: var(--black);
+    margin-bottom: 7px;
+    font-feature-settings: "tnum";
+    transition: color 0.18s ease;
+  }
+  .hero-cell .value.orange { color: var(--orange); }
+  .hero-cell .value.future { color: var(--future); }
+  .hero-cell .value.flash { animation: flashGlow 0.4s ease; }
+  @keyframes flashGlow {
+    0% { color: var(--orange); transform: scale(1.02); }
+    100% { color: inherit; transform: scale(1); }
+  }
+  .hero-cell .delta {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--grey-2);
+    line-height: 1.35;
+  }
+  /* Stripe-style left accent based on channel context */
+  .hero-cell.sponsor { border-left: none; }
+  .hero-cell.imsa::before {
+    content: ''; position: absolute; top: 0; bottom: 0; left: 0;
+    width: 3px; background: var(--orange);
+  }
+
+  /* ============================================================
+     ICP CROSS-REFERENCE (Brand view)
+     ============================================================ */
+  .crossref-panel {
+    margin-bottom: 16px;
+  }
+  .crossref-header {
+    background: var(--orange);
+    color: var(--white);
+    padding: 14px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .crossref-header .channel-tag {
+    background: var(--white);
+    color: var(--orange);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+  .crossref-header strong { font-weight: 800; }
+  .crossref-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 2px solid var(--black);
+    border-top: none;
+    background: var(--white);
+  }
+  .crossref-cell {
+    padding: 22px;
+    border-right: 1px solid var(--grey-5);
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+  .crossref-cell:last-child { border-right: none; }
+  .crossref-cell:hover { background: var(--orange-faint); }
+  .crossref-cell .name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--grey-2);
+    margin-bottom: 10px;
+  }
+  .crossref-cell .count {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 0.95;
+    color: var(--orange);
+    margin-bottom: 6px;
+    letter-spacing: -0.04em;
+    font-feature-settings: "tnum";
+  }
+  .crossref-cell .pct {
+    font-size: 11px;
+    color: var(--grey-2);
+    font-weight: 500;
+  }
+  .crossref-cell .pct strong { color: var(--black); font-weight: 800; }
+  .crossref-cell .hint {
+    font-size: 9px;
+    color: var(--orange);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 6px;
+    opacity: 0;
+    transition: opacity 0.12s;
+  }
+  .crossref-cell:hover .hint { opacity: 1; }
+
+  /* ============================================================
+     PANEL FRAMES
+     ============================================================ */
+  .panel {
+    border: 2px solid var(--black);
+    background: var(--white);
+    padding: 20px 22px;
+    margin-bottom: 16px;
+  }
+  .panel.future {
+    border-color: var(--future);
+    background: var(--future-bg);
+    position: relative;
+  }
+  .panel.future::after {
+    content: 'FUTURE STATE';
+    position: absolute;
+    top: -2px; right: 22px;
+    background: var(--future);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    padding: 6px 14px;
+  }
+  .panel h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 4px;
+    letter-spacing: -0.015em;
+  }
+  .panel.future h3 { color: var(--future); }
+  .panel-sub {
+    color: var(--grey-2);
+    font-size: 12px;
+    margin-bottom: 14px;
+  }
+  .panel-row { display: grid; gap: 16px; margin-bottom: 16px; }
+  .pr-2 { grid-template-columns: 1.3fr 1fr; }
+  .pr-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .future-note {
+    color: var(--black);
+    font-size: 13px;
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+  .future-note strong { font-weight: 800; color: var(--future); }
+  .footnote {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--grey-5);
+    font-size: 12px;
+    color: var(--grey-2);
+    line-height: 1.5;
+  }
+  .footnote strong { color: var(--black); font-weight: 700; }
+  .footnote em { color: var(--orange); font-style: normal; font-weight: 700; }
+
+  /* ============================================================
+     VENDOR STACK
+     ============================================================ */
+  .vendor-row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 14px;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--grey-5);
+  }
+  .vendor-row:last-of-type { border: none; }
+  .vendor-tier-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--grey-2);
+  }
+  .vendor-badge {
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 6px;
+    display: inline-block;
+    margin-bottom: 4px;
+  }
+  .vendor-badge.imsa-stack { background: var(--orange); color: var(--white); }
+  .vendor-badge.sow-named { background: var(--future); color: var(--white); }
+  .vendor-badge.future { background: transparent; color: var(--grey-2); border: 1.5px dashed var(--grey-3); }
+
+  /* ============================================================
+     CHARTS
+     ============================================================ */
+  .trend-svg { width: 100%; height: 100px; display: block; }
+  .trend-line { fill: none; stroke: var(--orange); stroke-width: 2.5; }
+  .trend-area { fill: var(--orange); fill-opacity: 0.15; }
+  .trend-dot { fill: var(--orange); }
+  .trend-grid { stroke: var(--black); stroke-width: 0.4; stroke-dasharray: 2,3; opacity: 0.15; }
+
+  .donut-svg { width: 130px; height: 130px; flex-shrink: 0; }
+  .donut-bg { fill: var(--grey-6); }
+  .donut-seg { fill: none; stroke-width: 18; }
+  .donut-label { font-family: "Inter", sans-serif; font-size: 22px; font-weight: 800; fill: var(--black); letter-spacing: -0.04em; }
+  .donut-sub { font-family: "Inter", sans-serif; font-size: 8px; font-weight: 800; letter-spacing: 0.16em; fill: var(--grey-3); }
+
+  /* ============================================================
+     SENTIMENT BAR + PULL QUOTE
+     ============================================================ */
+  .sent-bar {
+    display: flex;
+    height: 38px;
+    border: 2px solid var(--black);
+    background: var(--white);
+    margin-bottom: 10px;
+  }
+  .sent-bar .seg {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white);
+    font-weight: 800;
+    font-size: 14px;
+    font-feature-settings: "tnum";
+  }
+  .sent-bar .seg.pos { background: var(--pos); }
+  .sent-bar .seg.neu { background: var(--neu); }
+  .sent-bar .seg.neg { background: var(--neg); }
+
+  .sent-legend-item {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--grey-2);
+    font-weight: 600;
+  }
+  .sent-legend-dot { width: 10px; height: 10px; display: inline-block; }
+
+  .pull-quote {
+    background: var(--black);
+    color: var(--white);
+    padding: 22px 26px;
+    border-left: 6px solid var(--orange);
+    margin-top: 4px;
+  }
+  .pq-body {
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    margin-bottom: 14px;
+  }
+  .pq-attrib {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--grey-4);
+    font-weight: 700;
+  }
+  .pq-attrib .handle {
+    color: var(--orange);
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 800;
+  }
+  .pq-attrib .pill {
+    display: inline-block;
+    background: var(--grey-2);
+    color: var(--white);
+    padding: 2px 8px;
+    margin-left: 8px;
+    font-size: 9px;
+    font-weight: 800;
+  }
+  .pq-attrib .pill.pos { background: var(--pos); }
+  .pq-attrib .pill.neg { background: var(--neg); }
+
+  /* ============================================================
+     COMMENTER + CO-BRAND LISTS
+     ============================================================ */
+  .commenter-row {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--grey-5);
+  }
+  .commenter-row:last-child { border: none; padding-bottom: 0; }
+  .commenter-meta {
+    display: flex; gap: 10px; align-items: center;
+    font-size: 11px; color: var(--grey-2);
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+  .commenter-handle {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--orange);
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .commenter-text {
+    font-size: 13px;
+    color: var(--black);
+    line-height: 1.45;
+    font-weight: 500;
+  }
+
+  .cobrand-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--grey-5);
+  }
+  .cobrand-row:last-child { border: none; padding-bottom: 0; }
+  .cobrand-name {
+    font-size: 18px;
+    color: var(--black);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: capitalize;
+  }
+  .cobrand-count {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--orange);
+    font-feature-settings: "tnum";
+  }
+
+  /* ============================================================
+     DEMO 3-COL  (used in Audience future panel + Brand future)
+     ============================================================ */
+  .demo-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--grey-5);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .demo-row:last-child { border: none; }
+  .demo-row .label { color: var(--black); }
+  .demo-row .val { color: var(--future); font-weight: 800; font-feature-settings: "tnum"; }
+
+  /* ============================================================
+     RADAR + BUBBLES (Audience)
+     ============================================================ */
+  .radar-svg { width: 100%; height: 280px; display: block; }
+  .radar-grid { fill: none; stroke: var(--black); stroke-width: 0.5; opacity: 0.20; }
+  .radar-axis { stroke: var(--black); stroke-width: 0.5; opacity: 0.20; }
+  .radar-poly { fill: var(--orange); fill-opacity: 0.30; stroke: var(--orange); stroke-width: 2; }
+  .radar-dot { fill: var(--orange); stroke: var(--black); stroke-width: 1.5; }
+  .radar-label-axis { font-family: "Inter", sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.10em; fill: var(--black); }
+  .radar-label-val { font-family: "Inter", sans-serif; font-size: 18px; font-weight: 800; letter-spacing: -0.04em; fill: var(--orange); }
+
+  .bubble-svg { width: 100%; height: 280px; display: block; }
+
+  /* ============================================================
+     ICP CARDS (ICPs view)
+     ============================================================ */
+  .icp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .icp-card {
+    border: 2px solid var(--black);
+    background: var(--white);
+  }
+  .icp-head {
+    background: var(--black);
+    color: var(--white);
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: center;
+  }
+  .icp-card.imsa-fans .icp-head { background: var(--orange); }
+  .icp-card.american .icp-head { background: var(--grey-1); }
+  .icp-card.european .icp-head { background: var(--grey-1); }
+  .icp-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+  .icp-tagline {
+    color: rgba(255,255,255,0.75);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .icp-size-pill { text-align: right; }
+  .icp-size-num {
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 0.9;
+    color: var(--white);
+    letter-spacing: -0.045em;
+    font-feature-settings: "tnum";
+  }
+  .icp-size-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+    margin-top: 3px;
+  }
+  .icp-body { padding: 20px 24px; }
+  .icp-field { margin: 13px 0; }
+  .icp-field:first-child { margin-top: 0; }
+  .icp-field-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--grey-2);
+    margin-bottom: 6px;
+  }
+  .icp-field-value {
+    font-size: 13px;
+    color: var(--black);
+    line-height: 1.45;
+    font-weight: 500;
+  }
+  .icp-field-value.italic { font-style: italic; color: var(--grey-2); font-size: 12px; }
+
+  .behavior-bar {
+    display: flex;
+    height: 20px;
+    border: 2px solid var(--black);
+    margin-bottom: 8px;
+  }
+  .bb-seg { height: 100%; }
+  .bb-context { background: var(--black); }
+  .bb-analytical { background: var(--grey-2); }
+  .bb-purchase { background: var(--orange); }
+  .bb-reactive { background: var(--grey-4); }
+  .behavior-legend {
+    display: flex;
+    gap: 14px;
+    font-size: 11px;
+    color: var(--grey-2);
+    font-weight: 600;
+    flex-wrap: wrap;
+  }
+  .behavior-legend-item { display: flex; align-items: center; gap: 5px; }
+  .behavior-legend-dot { width: 10px; height: 10px; }
+
+  .icp-sentiment-bar {
+    display: flex;
+    height: 24px;
+    border: 2px solid var(--black);
+  }
+  .icp-sent-seg {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white);
+    font-weight: 800; font-size: 11px;
+    font-feature-settings: "tnum";
+  }
+  .icp-sent-seg.pos { background: var(--pos); }
+  .icp-sent-seg.neu { background: var(--neu); }
+  .icp-sent-seg.neg { background: var(--neg); }
+
+  .affinity-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .affinity-pill {
+    background: var(--orange-soft);
+    color: var(--orange-2);
+    padding: 4px 11px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1.5px solid var(--orange);
+    text-transform: capitalize;
+  }
+  .affinity-pill .n { font-weight: 500; opacity: 0.85; margin-left: 4px; }
+
+  .rep-voice-mini {
+    background: var(--grey-6);
+    padding: 12px 16px;
+    border-left: 4px solid var(--black);
+  }
+  .rep-voice-mini-handle {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--orange);
+    margin-bottom: 6px;
+  }
+  .rep-voice-mini-text {
+    font-size: 13px;
+    color: var(--black);
+    line-height: 1.4;
+    font-weight: 500;
+    font-style: italic;
+  }
+
+  .phase-dual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-top: 14px;
+    border: 2px solid var(--black);
+  }
+  .phase-now, .phase-next { padding: 12px 16px; }
+  .phase-now { background: var(--white); border-right: 2px solid var(--black); }
+  .phase-next { background: var(--future-bg); }
+  .phase-marker {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .phase-now .phase-marker { color: var(--orange); }
+  .phase-next .phase-marker { color: var(--future); }
+  .phase-text {
+    font-size: 12px;
+    color: var(--black);
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  /* ============================================================
+     SENTIMENT TRAJECTORY (Conversation view)
+     ============================================================ */
+  .stack-svg { width: 100%; height: 200px; display: block; }
+
+  /* ============================================================
+     THEME SHIFTS (Conversation view)
+     ============================================================ */
+  .theme-row {
+    display: grid;
+    grid-template-columns: 1fr 200px 60px;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--grey-5);
+  }
+  .theme-row:last-child { border: none; }
+  .theme-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--black);
+  }
+  .theme-vis {
+    height: 18px;
+    position: relative;
+    background: var(--grey-6);
+    border: 1px solid var(--grey-5);
+  }
+  .theme-vis-center {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: var(--grey-3);
+  }
+  .theme-bar {
+    position: absolute;
+    top: 1px; bottom: 1px;
+  }
+  .theme-bar.up { left: 50%; background: var(--pos); }
+  .theme-bar.down { right: 50%; background: var(--neg); }
+  .theme-bar.flat { left: 50%; transform: translateX(-50%); background: var(--grey-3); }
+  .theme-delta {
+    font-size: 18px;
+    font-weight: 800;
+    text-align: right;
+    font-feature-settings: "tnum";
+  }
+  .theme-delta.up { color: var(--pos); }
+  .theme-delta.down { color: var(--neg); }
+  .theme-delta.flat { color: var(--grey-3); }
+
+  /* ============================================================
+     PEOPLE / EVENTS / GEO BARS (Conversation + Marketing)
+     ============================================================ */
+  .list-bar {
+    display: grid;
+    grid-template-columns: 1fr 60px;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--grey-5);
+  }
+  .list-bar:last-child { border: none; }
+  .list-bar-name {
+    font-size: 13px;
+    color: var(--black);
+    font-weight: 600;
+  }
+  .list-bar-track {
+    grid-column: 1 / -1;
+    height: 6px;
+    background: var(--grey-6);
+    margin-top: 5px;
+    position: relative;
+  }
+  .list-bar-fill {
+    height: 100%;
+    background: var(--orange);
+  }
+  .list-bar-count {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--orange);
+    font-feature-settings: "tnum";
+    text-align: right;
+  }
+
+  /* ============================================================
+     TIMING CURVE (Marketing)
+     ============================================================ */
+  .timing-svg { width: 100%; height: 220px; display: block; }
+  .timing-line { fill: none; stroke: var(--orange); stroke-width: 3; }
+  .timing-area { fill: var(--orange); fill-opacity: 0.18; }
+  .timing-dot { fill: var(--orange); stroke: var(--black); stroke-width: 1.5; }
+  .timing-peak-line { stroke: var(--orange); stroke-width: 1.5; stroke-dasharray: 3,3; opacity: 0.55; }
+  .timing-annotation { font-family: "Inter", sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.12em; fill: var(--orange); }
+  .timing-label { font-family: "Inter", sans-serif; font-size: 10px; font-weight: 700; fill: var(--grey-3); }
+  .timing-label.race { fill: var(--orange); font-weight: 800; }
+
+  /* ============================================================
+     RACE COMPARISON SMALL MULTIPLES (Marketing)
+     ============================================================ */
+  .race-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .race-mini {
+    border: 1px solid var(--grey-5);
+    background: var(--white);
+    padding: 14px 16px;
+  }
+  .race-mini-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 2px;
+    letter-spacing: -0.005em;
+  }
+  .race-mini-date {
+    font-size: 11px;
+    color: var(--grey-3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .race-mini-volume {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--orange);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .race-mini-volume-sub {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--grey-2);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .race-mini-sent {
+    display: flex;
+    height: 8px;
+    margin-top: 10px;
+    margin-bottom: 8px;
+    border: 1px solid var(--black);
+  }
+  .race-mini-sent .sent-seg.pos { background: var(--pos); }
+  .race-mini-sent .sent-seg.neu { background: var(--neu); }
+  .race-mini-sent .sent-seg.neg { background: var(--neg); }
+  .race-mini-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--grey-2);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .race-mini-meta strong { color: var(--orange); font-weight: 800; }
+
+  /* ============================================================
+     ALERT CARDS (Conversation future)
+     ============================================================ */
+  .alert-card {
+    background: var(--white);
+    border-left: 4px solid var(--future);
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    align-items: center;
+  }
+  .alert-icon {
+    width: 38px; height: 38px;
+    background: var(--future);
+    color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800;
+  }
+  .alert-meta {
+    display: flex; gap: 14px; align-items: baseline; margin-bottom: 5px;
+  }
+  .alert-type {
+    font-size: 11px; font-weight: 800;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--future);
+  }
+  .alert-date {
+    font-size: 10px; color: var(--grey-2); font-weight: 700;
+  }
+  .alert-body {
+    font-size: 13px; color: var(--black);
+    line-height: 1.4; font-weight: 500;
+  }
+  .alert-body strong { font-weight: 800; color: var(--orange); }
+
+  /* ============================================================
+     ACTION BAR
+     ============================================================ */
+  .action-bar {
+    display: flex;
+    gap: 10px;
+    padding: 16px 0;
+    margin-top: 8px;
+    border-top: 2px solid var(--black);
+  }
+  .action-bar button {
+    padding: 12px 22px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    border: 2px solid var(--black);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .action-bar button.primary {
+    background: var(--black);
+    color: var(--white);
+  }
+  .action-bar button.primary.sponsor { background: var(--black); }
+  .action-bar button.primary.imsa { background: var(--orange); border-color: var(--orange); }
+  .action-bar button.secondary {
+    background: var(--white);
+    color: var(--black);
+  }
+  .action-bar button:hover { transform: translateY(-1px); }
+  .action-bar button.primary:hover { background: var(--orange); border-color: var(--orange); }
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  .footer {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 3px solid var(--black);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 22px;
+    align-items: end;
+  }
+  .footer-note {
+    font-size: 10px;
+    color: var(--grey-2);
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    max-width: 78%;
+    font-weight: 500;
+  }
+  .footer-note strong { color: var(--black); font-weight: 800; }
+  .footer-colophon {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--grey-2);
+    text-align: right;
+    line-height: 1.7;
+    font-weight: 700;
+  }
+  .footer-colophon strong { color: var(--black); font-weight: 800; }
+
+  /* ============================================================
+     COMPETITIVE VIEW  (refreshable input)
+     ============================================================ */
+  .refresh-banner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    align-items: center;
+    background: var(--white);
+    border: 2px dashed var(--grey-3);
+    padding: 10px 18px;
+    margin-bottom: 16px;
+  }
+  .refresh-banner-left { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+  .refresh-banner-tag {
+    font-size: 9px; font-weight: 800; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--grey-2);
+    background: var(--grey-6); padding: 4px 10px;
+    white-space: nowrap;
+  }
+  .refresh-banner-detail { font-size: 12px; color: var(--grey-2); font-weight: 500; }
+  .refresh-banner-detail strong { color: var(--black); font-weight: 700; }
+
+  /* Scorecard table */
+  .score-table {
+    display: grid;
+    grid-template-columns: 1.6fr repeat(6, 1fr) 0.9fr;
+    gap: 0;
+    border: 2px solid var(--black);
+    background: var(--white);
+    font-size: 12px;
+  }
+  .score-cell {
+    padding: 12px 10px;
+    border-right: 1px solid var(--grey-5);
+    border-bottom: 1px solid var(--grey-5);
+    display: flex; align-items: center;
+    font-weight: 500;
+  }
+  .score-cell.header {
+    background: var(--grey-6);
+    font-size: 9px; font-weight: 800;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--grey-2);
+    padding: 12px 10px;
+  }
+  .score-cell.brand-name {
+    font-weight: 700; color: var(--black); font-size: 13px;
+  }
+  .score-cell.imsa { background: var(--orange-faint); }
+  .score-cell.imsa.brand-name { color: var(--orange); font-weight: 800; }
+  .score-cell.total {
+    justify-content: center;
+    font-size: 20px; font-weight: 800;
+    color: var(--black); font-feature-settings: "tnum";
+    letter-spacing: -0.02em;
+  }
+  .score-cell.imsa.total { color: var(--orange); }
+  .score-cell.sub {
+    justify-content: center; font-weight: 700;
+    font-feature-settings: "tnum";
+  }
+  .score-cell:last-child { border-right: none; }
+  .score-cell:nth-last-child(-n+8) { border-bottom: none; }
+  .score-bar {
+    display: inline-block; width: 40px; height: 6px;
+    background: var(--grey-5); margin-left: 8px; position: relative;
+    vertical-align: middle;
+  }
+  .score-bar-fill { position: absolute; top:0; left:0; bottom:0; background: var(--grey-2); }
+  .score-cell.imsa .score-bar-fill { background: var(--orange); }
+
+  /* Positioning matrix */
+  .pos-matrix-svg { width: 100%; height: 380px; display: block; }
+
+  /* Growth signal cards */
+  .growth-signal-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 2px solid var(--black);
+    background: var(--white);
+  }
+  .growth-signal {
+    padding: 20px 20px;
+    border-right: 1px solid var(--grey-5);
+    display: flex; flex-direction: column; justify-content: space-between;
+    min-height: 130px;
+  }
+  .growth-signal:last-child { border-right: none; }
+  .growth-signal-value {
+    font-size: 40px; font-weight: 800; letter-spacing: -0.045em;
+    color: var(--orange); line-height: 0.95;
+    font-feature-settings: "tnum";
+    margin-bottom: 6px;
+  }
+  .growth-signal-label {
+    font-size: 10px; font-weight: 800;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--grey-2);
+    margin-bottom: 10px;
+  }
+  .growth-signal-note {
+    font-size: 12px; color: var(--grey-2);
+    line-height: 1.4; font-weight: 500;
+  }
+
+  /* Vs. recommendation cards */
+  .vs-card {
+    border: 1.5px solid var(--grey-5);
+    padding: 18px 22px;
+    margin-bottom: 12px;
+    background: var(--white);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    align-items: start;
+  }
+  .vs-card.overall {
+    border-color: var(--orange);
+    border-width: 2px;
+    background: var(--orange-faint);
+  }
+  .vs-card-tag {
+    background: var(--black);
+    color: var(--white);
+    padding: 6px 14px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    align-self: start;
+  }
+  .vs-card.overall .vs-card-tag { background: var(--orange); }
+  .vs-card-body {
+    font-size: 13px; color: var(--black);
+    line-height: 1.5; font-weight: 500;
+  }
+  .vs-card-body strong { font-weight: 700; }
+  .vs-card-title {
+    font-size: 15px; font-weight: 800;
+    color: var(--black); letter-spacing: -0.01em;
+    margin-bottom: 8px; display: block;
+  }
+
+  /* AI visibility grid */
+  .ai-visibility-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    border: 2px solid var(--black);
+    background: var(--white);
+  }
+  .ai-vis-cell {
+    padding: 18px 16px;
+    border-right: 1px solid var(--grey-5);
+    text-align: center;
+  }
+  .ai-vis-cell:last-child { border-right: none; }
+  .ai-vis-cell.imsa { background: var(--orange-faint); }
+  .ai-vis-brand {
+    font-size: 11px; font-weight: 700;
+    color: var(--grey-2);
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .ai-vis-cell.imsa .ai-vis-brand { color: var(--orange); }
+  .ai-vis-count {
+    font-size: 42px; font-weight: 800; letter-spacing: -0.045em;
+    color: var(--black); line-height: 0.95;
+    font-feature-settings: "tnum";
+    margin-bottom: 6px;
+  }
+  .ai-vis-cell.imsa .ai-vis-count { color: var(--orange); }
+  .ai-vis-label {
+    font-size: 10px; color: var(--grey-3);
+    font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Peer profile cards */
+  .peer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .peer-card {
+    border: 1.5px solid var(--grey-5);
+    background: var(--white);
+  }
+  .peer-card-head {
+    padding: 16px 20px;
+    background: var(--black);
+    color: var(--white);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .peer-card-name {
+    font-size: 16px; font-weight: 800;
+    letter-spacing: -0.015em; line-height: 1.1;
+  }
+  .peer-card-score {
+    text-align: right;
+    font-size: 26px; font-weight: 800;
+    color: var(--orange);
+    letter-spacing: -0.03em;
+    font-feature-settings: "tnum";
+    line-height: 1;
+  }
+  .peer-card-score .max { font-size: 12px; color: var(--grey-4); font-weight: 600; }
+  .peer-card-body { padding: 16px 20px; }
+  .peer-field { margin: 10px 0; }
+  .peer-field:first-child { margin-top: 0; }
+  .peer-field-label {
+    font-size: 9px; font-weight: 800;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--grey-2);
+    margin-bottom: 5px;
+  }
+  .peer-field-value {
+    font-size: 12px; color: var(--black);
+    line-height: 1.5; font-weight: 500;
+  }
+  .peer-swot-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .peer-swot {
+    padding: 10px 12px;
+    background: var(--grey-6);
+    border-left: 3px solid var(--grey-2);
+  }
+  .peer-swot.strengths { border-left-color: var(--pos); }
+  .peer-swot.weaknesses { border-left-color: var(--neg); }
+  .peer-swot-label {
+    font-size: 9px; font-weight: 800;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--grey-2);
+    margin-bottom: 6px;
+  }
+  .peer-swot.strengths .peer-swot-label { color: var(--pos); }
+  .peer-swot.weaknesses .peer-swot-label { color: var(--neg); }
+  .peer-swot-item {
+    font-size: 11px; color: var(--black);
+    line-height: 1.4; font-weight: 500;
+    padding: 3px 0;
+  }
+  .peer-swot-item::before { content: "· "; color: var(--grey-3); font-weight: 800; }
+
+  /* ============================================================
+     INLINE COMPETITIVE HOOKS  (Brand view + ICPs cards)
+     ============================================================ */
+  .competitive-strip {
+    background: var(--black);
+    color: var(--white);
+    padding: 12px 20px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: center;
+    font-size: 12px;
+  }
+  .competitive-strip-tag {
+    background: var(--orange);
+    color: var(--white);
+    padding: 4px 10px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .competitive-strip-body {
+    color: var(--white);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .competitive-strip-body strong { color: var(--orange); font-weight: 800; }
+  .competitive-strip-link {
+    font-size: 10px; font-weight: 800;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--orange);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .competitive-strip-link:hover { text-decoration: underline; }
+
+  .icp-competitive-frame {
+    background: var(--grey-6);
+    border-left: 3px solid var(--black);
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--black);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .icp-competitive-frame strong { color: var(--orange); font-weight: 800; }
+  .icp-competitive-frame-tag {
+    display: inline-block;
+    background: var(--black);
+    color: var(--white);
+    padding: 2px 6px;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  /* ============================================================
+     DRIVERS / SERIES / GEOGRAPHY / SPONSORS  (views 07–10)
+     ============================================================ */
+
+  /* Driver leaderboard rows */
+  .driver-row {
+    display: grid;
+    grid-template-columns: 30px 1fr auto 220px auto;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--grey-5);
+  }
+  .driver-row:last-child { border: none; }
+  .driver-rank {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px; font-weight: 700;
+    color: var(--grey-3);
+    font-feature-settings: "tnum";
+  }
+  .driver-name {
+    font-size: 14px; font-weight: 700;
+    color: var(--black); letter-spacing: -0.005em;
+  }
+  .driver-meta {
+    font-size: 10px;
+    color: var(--grey-2);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+  .driver-meta .series-tag {
+    background: var(--grey-6);
+    padding: 2px 7px;
+    margin-right: 4px;
+  }
+  .driver-meta .series-tag.imsa { background: var(--orange); color: var(--white); }
+  .driver-count-wrap { text-align: right; }
+  .driver-count {
+    font-size: 26px; font-weight: 800;
+    color: var(--orange); letter-spacing: -0.03em;
+    font-feature-settings: "tnum";
+    line-height: 1;
+  }
+  .driver-count-sub { font-size: 10px; color: var(--grey-3); font-weight: 600; }
+  .driver-sent-bar {
+    display: flex;
+    height: 10px;
+    border: 1px solid var(--black);
+  }
+  .driver-sent-bar .seg.pos { background: var(--pos); }
+  .driver-sent-bar .seg.neu { background: var(--neu); }
+  .driver-sent-bar .seg.neg { background: var(--neg); }
+  .driver-cluster-badge {
+    background: var(--black);
+    color: var(--white);
+    padding: 4px 10px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .driver-cluster-badge.imsa { background: var(--orange); }
+
+  /* Driver-cluster affinity matrix */
+  .affinity-matrix {
+    display: grid;
+    grid-template-columns: 1.4fr repeat(4, 1fr);
+    gap: 0;
+    border: 2px solid var(--black);
+    background: var(--white);
+    font-size: 12px;
+  }
+  .aff-cell {
+    padding: 10px 12px;
+    border-right: 1px solid var(--grey-5);
+    border-bottom: 1px solid var(--grey-5);
+    display: flex; align-items: center;
+    font-weight: 500;
+  }
+  .aff-cell.header {
+    background: var(--grey-6);
+    font-size: 9px; font-weight: 800;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--grey-2);
+    justify-content: center;
+  }
+  .aff-cell:last-child, .aff-cell.header:last-child { border-right: none; }
+  .aff-cell.driver-name-cell {
+    font-weight: 700; color: var(--black); font-size: 13px;
+  }
+  .aff-cell.affinity-value {
+    justify-content: center;
+    font-weight: 700; font-size: 13px;
+    color: var(--black); font-feature-settings: "tnum";
+  }
+  .aff-cell.affinity-value.hi {
+    background: var(--orange); color: var(--white); font-weight: 800;
+  }
+  .aff-cell.affinity-value.mid { background: var(--orange-faint); color: var(--orange-2); }
+  .aff-cell.affinity-value.lo { color: var(--grey-3); }
+
+  /* Series breakout rows (IMSA properties + crossover) */
+  .series-row {
+    display: grid;
+    grid-template-columns: 30px 1fr 60px 1fr 100px;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--grey-5);
+  }
+  .series-row:last-child { border: none; }
+  .series-icon {
+    width: 26px; height: 26px;
+    background: var(--orange);
+    color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+  }
+  .series-icon.crossover { background: var(--grey-2); }
+  .series-name-cell {
+    font-size: 14px; font-weight: 700;
+    color: var(--black); letter-spacing: -0.005em;
+  }
+  .series-name-sub {
+    font-size: 11px; color: var(--grey-2);
+    font-weight: 500; margin-top: 3px;
+  }
+  .series-mentions {
+    font-size: 22px; font-weight: 800;
+    color: var(--orange); font-feature-settings: "tnum";
+    letter-spacing: -0.03em;
+    text-align: right;
+  }
+  .series-note {
+    font-size: 12px; color: var(--grey-2);
+    font-weight: 500; line-height: 1.4;
+  }
+  .series-tag {
+    background: var(--orange);
+    color: var(--white);
+    padding: 4px 10px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .series-tag.crossover { background: var(--black); }
+
+  /* Venue leaderboard rows */
+  .venue-row {
+    display: grid;
+    grid-template-columns: 30px 1fr 180px auto 80px;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--grey-5);
+  }
+  .venue-row:last-child { border: none; }
+  .venue-name-cell {
+    font-size: 14px; font-weight: 700;
+    color: var(--black); letter-spacing: -0.005em;
+  }
+  .venue-name-sub {
+    font-size: 11px; color: var(--grey-2);
+    font-weight: 500; margin-top: 3px;
+  }
+  .venue-region { font-size: 11px; color: var(--grey-3); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .venue-bar-track {
+    height: 8px; background: var(--grey-6);
+    border: 1px solid var(--grey-5);
+  }
+  .venue-bar-fill { height: 100%; background: var(--orange); }
+  .venue-count {
+    font-size: 22px; font-weight: 800;
+    color: var(--orange); font-feature-settings: "tnum";
+    letter-spacing: -0.03em;
+    text-align: right;
+  }
+  .venue-imsa-flag {
+    background: var(--orange);
+    color: var(--white);
+    padding: 3px 8px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .venue-imsa-flag.notrack { background: var(--grey-5); color: var(--grey-3); }
+
+  /* Cluster geography map (simple list) */
+  .cluster-geo-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--grey-5);
+    align-items: baseline;
+  }
+  .cluster-geo-row:last-child { border: none; }
+  .cluster-geo-name {
+    font-size: 13px; font-weight: 700;
+    color: var(--black);
+  }
+  .cluster-geo-region {
+    font-size: 11px; color: var(--grey-2);
+    font-weight: 500; margin-top: 3px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* Track-sponsor angle rows */
+  .track-sponsor-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--grey-5);
+    align-items: center;
+  }
+  .track-sponsor-row:last-child { border: none; }
+  .track-sponsor-track {
+    font-size: 14px; font-weight: 700; color: var(--black);
+  }
+  .track-sponsor-track-sub {
+    font-size: 11px; color: var(--grey-2);
+    font-weight: 500; margin-top: 3px;
+  }
+  .track-sponsor-brands { display: flex; flex-wrap: wrap; gap: 6px; }
+  .track-sponsor-icp {
+    background: var(--black);
+    color: var(--white);
+    padding: 4px 10px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    display: inline-block;
+  }
+  .track-sponsor-icp.imsa { background: var(--orange); }
+
+  /* Sponsor category grid */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .category-card {
+    border: 2px solid var(--grey-5);
+    background: var(--white);
+    padding: 18px 20px;
+    position: relative;
+  }
+  .category-card.active {
+    border-color: var(--orange);
+    background: var(--orange-faint);
+  }
+  .category-card-status {
+    position: absolute;
+    top: -2px; right: 14px;
+    background: var(--grey-5);
+    color: var(--grey-2);
+    padding: 4px 10px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .category-card.active .category-card-status {
+    background: var(--orange);
+    color: var(--white);
+  }
+  .category-card-name {
+    font-size: 15px; font-weight: 800;
+    color: var(--black); letter-spacing: -0.015em;
+    margin-bottom: 6px;
+    padding-right: 90px;
+  }
+  .category-card.active .category-card-name { color: var(--orange); }
+  .category-card-detail {
+    font-size: 12px; color: var(--grey-2);
+    line-height: 1.5; font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .category-card-example {
+    font-size: 11px;
+    color: var(--grey-3);
+    font-style: italic;
+    padding-top: 10px;
+    border-top: 1px solid var(--grey-5);
+    line-height: 1.5;
+  }
+  .category-card-example strong { color: var(--black); font-weight: 700; font-style: normal; }
+
+  /* Auto sub-breakout */
+  .auto-sub-row {
+    display: grid;
+    grid-template-columns: 1fr auto 160px auto;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--grey-5);
+    align-items: center;
+  }
+  .auto-sub-row:last-child { border: none; }
+  .auto-sub-name {
+    font-size: 13px; font-weight: 700; color: var(--black);
+  }
+  .auto-sub-count {
+    font-size: 20px; font-weight: 800;
+    color: var(--orange); font-feature-settings: "tnum";
+    letter-spacing: -0.03em;
+    text-align: right;
+  }
+  .auto-sub-detail {
+    font-size: 11px; color: var(--grey-2);
+    font-weight: 500;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="masthead">
+    <div class="brand-lockup">
+      <div class="brand-square">P</div>
+      <div class="brand-text-stack">
+        <div class="brand-mark">Prospector <span class="accent">/</span> IMSA</div>
+        <div class="masthead-title">
+          Audience Intelligence
+          <span class="small">Window: May 4–18, 2026 · Reference build · v8 data</span>
+        </div>
+      </div>
+    </div>
+    <div></div>
+    <div class="masthead-meta">
+      <span class="pulse"></span><strong>Live</strong> reference build<br>
+      Audience: <strong>119</strong> engagers · <strong>260</strong> events<br>
+      <strong>4</strong> ICP clusters · <strong>8</strong> tracked brands
+    </div>
+  </div>
+
+  <div class="topnav" id="topnav">
+    <button class="active" data-view="brand">
+      <span class="nav-num">01</span>Brand<span class="nav-ch sponsor">Sponsor</span>
+    </button>
+    <button data-view="audience">
+      <span class="nav-num">02</span>Audience<span class="nav-ch both">Both</span>
+    </button>
+    <button data-view="icps">
+      <span class="nav-num">03</span>ICPs<span class="nav-ch imsa">IMSA</span>
+    </button>
+    <button data-view="conversation">
+      <span class="nav-num">04</span>Conversation<span class="nav-ch both">Both</span>
+    </button>
+    <button data-view="marketing">
+      <span class="nav-num">05</span>Marketing<span class="nav-ch imsa">IMSA</span>
+    </button>
+    <button data-view="competitive">
+      <span class="nav-num">06</span>Competitive<span class="nav-ch imsa">IMSA</span>
+    </button>
+    <button data-view="drivers">
+      <span class="nav-num">07</span>Drivers<span class="nav-ch both">Both</span>
+    </button>
+    <button data-view="series">
+      <span class="nav-num">08</span>Series<span class="nav-ch imsa">IMSA</span>
+    </button>
+    <button data-view="geography">
+      <span class="nav-num">09</span>Geography<span class="nav-ch both">Both</span>
+    </button>
+    <button data-view="sponsors">
+      <span class="nav-num">10</span>Sponsors<span class="nav-ch sponsor">Sponsor</span>
+    </button>
+  </div>
+
+  <!-- ============================================================
+       BRAND VIEW
+       ============================================================ -->
+  <div class="view active" id="view-brand">
+
+    <div class="view-header sponsor">
+      <div class="view-header-tag-stack">
+        <span class="view-header-pill">Sponsor channel</span>
+        <div class="view-header-label">Outward<br>intelligence</div>
+      </div>
+      <div class="view-header-body">
+        <strong>What does IMSA's audience say about specific brands?</strong> Use this to walk into a sponsor meeting with hard numbers. Each brand profile also surfaces ICP overlap — bridge to IMSA marketing channel below.
+      </div>
+    </div>
+
+    <div class="gaps-callout" onclick="document.getElementById('brand-future-panel').scrollIntoView({behavior:'smooth'})">
+      <span class="gaps-callout-tag">Post-POC →</span>
+      <span class="gaps-callout-body">Demographic enrichment, paid media activation, lookalike deployment. <strong>Jump to future-state panel ↓</strong></span>
+    </div>
+
+    <div class="brand-picker" id="brandPicker"></div>
+
+    <div class="hero">
+      <div class="hero-cell sponsor"><div class="label">Mentions in window</div><div class="value" id="brandMentions">—</div><div class="delta">15 days · racing-relevant</div></div>
+      <div class="hero-cell sponsor"><div class="label">Unique commenters</div><div class="value" id="brandAuthors">—</div><div class="delta">distinct YouTube handles</div></div>
+      <div class="hero-cell sponsor"><div class="label">Video diversity</div><div class="value" id="brandVideos">—</div><div class="delta">distinct videos surfaced</div></div>
+      <div class="hero-cell sponsor"><div class="label">Share of voice</div><div class="value orange" id="brandSOV">—</div><div class="delta">vs all tracked brands</div></div>
+    </div>
+
+    <!-- ICP cross-reference -->
+    <div class="crossref-panel">
+      <div class="crossref-header">
+        <span class="channel-tag">↓ IMSA cross-reference</span>
+        <span>Which IMSA ICP clusters mention <strong id="brandXName">—</strong> most? Click a cluster to see its full activation profile.</span>
+      </div>
+      <div class="crossref-grid" id="brandCrossref"></div>
+    </div>
+
+    <div class="panel-row pr-2">
+      <div class="panel">
+        <h3>↗ Mention trend · <span id="brandTrendName">—</span></h3>
+        <div class="panel-sub">Daily mentions across the window. Shows whether conversation is building, fading, or steady.</div>
+        <svg class="trend-svg" id="brandTrendSvg" viewBox="0 0 500 100" preserveAspectRatio="none"></svg>
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--grey-3); font-weight: 700; letter-spacing: 0.08em; margin-top: 6px; text-transform: uppercase;">
+          <span>May 4</span><span>May 11</span><span>May 18</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>● Share of voice</h3>
+        <div class="panel-sub">Selected brand's share vs all tracked brands.</div>
+        <div style="display: flex; align-items: center; gap: 18px;">
+          <svg class="donut-svg" id="brandSOVSvg" viewBox="0 0 120 120"></svg>
+          <div id="brandSOVLegend" style="font-size: 12px; flex: 1;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>How the audience talks about <span id="brandSentName">—</span></h3>
+      <div class="panel-sub">Sentiment split + representative comment.</div>
+      <div class="sent-bar" id="brandSentBar"></div>
+      <div style="display: flex; gap: 18px; margin: 10px 0 14px;" id="brandSentLegend"></div>
+      <div id="brandPullQuote"></div>
+    </div>
+
+    <div class="panel-row pr-2">
+      <div class="panel">
+        <h3>Top commenters mentioning <span id="brandCmtName">—</span></h3>
+        <div class="panel-sub">Real YouTube handles. Click in production to open in identity layer.</div>
+        <div id="brandCommenters"></div>
+      </div>
+      <div class="panel">
+        <h3>Brands co-mentioned in same comments</h3>
+        <div class="panel-sub">Complementary-sponsor prospecting.</div>
+        <div id="brandCoBrands"></div>
+      </div>
+    </div>
+
+    <!-- Inline competitive hook (populated conditionally by JS) -->
+    <div id="brandCompetitiveStrip"></div>
+
+    <div class="panel future" id="brand-future-panel">
+      <h3>Brand audience composition · <span id="brandFutName">—</span></h3>
+      <div class="future-note"><strong>Future state — unlocked when Phase 1 succeeds.</strong> Resolves identified commenter handles into validated demographic composition. Numbers below are illustrative.</div>
+      <div class="vendor-row"><span class="vendor-tier-label">IMSA stack</span><div><span class="vendor-badge imsa-stack">Sprout Social</span><span class="vendor-badge imsa-stack">Zoomph</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">SOW-named</span><div><span class="vendor-badge sow-named">Experian</span><span class="vendor-badge sow-named">Meta Ads Manager</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">Broader future</span><div><span class="vendor-badge future">LinkedIn Marketing API</span><span class="vendor-badge future">LiveRamp</span><span class="vendor-badge future">Acxiom InfoBase</span></div></div>
+      <div class="panel-row pr-3" style="margin-bottom: 0; margin-top: 16px;">
+        <div><div class="icp-field-label" style="color: var(--future); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--future);">Age <span style="color: var(--grey-3); font-weight: 500;">(illustrative)</span></div><div id="brandFutAge"></div></div>
+        <div><div class="icp-field-label" style="color: var(--future); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--future);">Geo <span style="color: var(--grey-3); font-weight: 500;">(illustrative)</span></div><div id="brandFutGeo"></div></div>
+        <div><div class="icp-field-label" style="color: var(--future); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--future);">Life stage <span style="color: var(--grey-3); font-weight: 500;">(illustrative)</span></div><div id="brandFutLife"></div></div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="primary sponsor" onclick="alert('In production: generates a sponsor-meeting brief PDF with all data above + the full commenter list. Branded as Prospector / IMSA.')">📄 Generate sponsor brief</button>
+      <button class="secondary" onclick="alert('In production: opens commenters in Prospector identity layer.')">→ Open in identity layer</button>
+      <button class="secondary" onclick="alert('In production: exports CSV of all brand mentions.')">↓ Export CSV</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       AUDIENCE VIEW
+       ============================================================ -->
+  <div class="view" id="view-audience">
+
+    <div class="view-header both">
+      <div class="view-header-tag-stack">
+        <span class="view-header-pill both">Both channels</span>
+        <div class="view-header-label">Shared<br>analytical layer</div>
+      </div>
+      <div class="view-header-body">
+        <strong>Audience composition, behaviors, and passion clusters.</strong> Feeds both the sponsor channel (brand pitches) and the IMSA channel (direct marketing). Drill into ICPs for activation specs.
+      </div>
+    </div>
+
+    <div class="gaps-callout" onclick="document.getElementById('audience-future-panel').scrollIntoView({behavior:'smooth'})">
+      <span class="gaps-callout-tag">Post-POC →</span>
+      <span class="gaps-callout-body">Today we identify engaged audience by behavior. <strong>Phase 2 enriches each handle into validated demographics ↓</strong></span>
+    </div>
+
+    <div class="hero">
+      <div class="hero-cell"><div class="label">Unique engagers</div><div class="value">119</div><div class="delta">distinct commenters identified</div></div>
+      <div class="hero-cell"><div class="label">Active days</div><div class="value">15</div><div class="delta">May 4–18 window</div></div>
+      <div class="hero-cell"><div class="label">Engagement events</div><div class="value">260</div><div class="delta">filtered + deduped</div></div>
+      <div class="hero-cell"><div class="label">Passion clusters</div><div class="value orange">4</div><div class="delta">deployable as ICPs · see ICP view</div></div>
+    </div>
+
+    <div class="panel-row pr-2">
+      <div class="panel">
+        <h3>◎ Engagement behavior radar</h3>
+        <div class="panel-sub">From real comment-body analysis. Shows what kind of engagement the audience exhibits.</div>
+        <svg class="radar-svg" id="behaviorRadar" viewBox="0 0 380 290"></svg>
+        <div class="footnote"><strong>54%</strong> include racing context. <strong>23%</strong> analytical. <strong>17%</strong> express purchase signal — <em>commercially actionable</em>. <strong>12%</strong> pure reactive.</div>
+      </div>
+
+      <div class="panel">
+        <h3>○ Passion clusters · high-level overview</h3>
+        <div class="panel-sub">Real audience subgroups from cross-content engagement. Size = audience count. Click any bubble to jump to its activation profile.</div>
+        <svg class="bubble-svg" id="passionBubbles" viewBox="0 0 500 290"></svg>
+        <div class="footnote">NASCAR fans largest (48). IMSA fans = 23. American loyalists = 22. European purists = 14. Clusters overlap — a commenter can belong to multiple. <strong onclick="gotoView('icps')" style="cursor:pointer; color: var(--orange);">Click "ICPs" tab → full activation profiles.</strong></div>
+      </div>
+    </div>
+
+    <div class="panel future" id="audience-future-panel">
+      <h3>Demographic + psychographic overlay on engaged audience</h3>
+      <div class="future-note"><strong>Future state.</strong> Layers validated demographic data onto the 119 commenters identified today.</div>
+      <div class="vendor-row"><span class="vendor-tier-label">IMSA stack</span><div><span class="vendor-badge imsa-stack">Sprout Social</span><span class="vendor-badge imsa-stack">Zoomph</span><span class="vendor-badge imsa-stack">IMSA CRM</span><span class="vendor-badge imsa-stack">Constant Contact</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">SOW-named</span><div><span class="vendor-badge sow-named">Experian</span><span class="vendor-badge sow-named">Meta Ads Manager</span><span class="vendor-badge sow-named">Google Ads</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">Broader future</span><div><span class="vendor-badge future">LinkedIn Marketing API</span><span class="vendor-badge future">LiveRamp</span><span class="vendor-badge future">Acxiom InfoBase</span><span class="vendor-badge future">Crimson Hexagon</span><span class="vendor-badge future">Brandwatch</span></div></div>
+      <div class="panel-row pr-3" style="margin-bottom: 0; margin-top: 16px;">
+        <div><div class="icp-field-label" style="color: var(--future); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--future);">Age (illustrative)</div><div id="audAge"></div></div>
+        <div><div class="icp-field-label" style="color: var(--future); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--future);">Top geo markets (illustrative)</div><div id="audGeo"></div></div>
+        <div><div class="icp-field-label" style="color: var(--future); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--future);">Life stage (illustrative)</div><div id="audLife"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ICPs VIEW
+       ============================================================ -->
+  <div class="view" id="view-icps">
+
+    <div class="view-header imsa">
+      <div class="view-header-tag-stack">
+        <span class="view-header-pill imsa">IMSA marketing</span>
+        <div class="view-header-label">Deployable<br>ICP profiles</div>
+      </div>
+      <div class="view-header-body">
+        <strong>Deployable ICP profiles for IMSA's own direct marketing.</strong> Each card is a passion cluster turned into an Ideal Customer Profile — audience size, demographic snapshot, brand affinities, recommended channels, message angles, and lookalike seed status. The same data that powers sponsor briefs powers IMSA's ticket marketing, email segmentation, and paid media targeting.
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-cell imsa"><div class="label">ICP clusters defined</div><div class="value">4</div><div class="delta">from real engagement data</div></div>
+      <div class="hero-cell imsa"><div class="label">Total addressable</div><div class="value">119</div><div class="delta">unique commenters across clusters</div></div>
+      <div class="hero-cell imsa"><div class="label">Lookalike-ready</div><div class="value future">~38K</div><div class="delta">future state · seed expansion via Meta / Google</div></div>
+      <div class="hero-cell imsa"><div class="label">CRM segments</div><div class="value future">4</div><div class="delta">future state · push to Constant Contact</div></div>
+    </div>
+
+    <div class="panel">
+      <h3>Why ICPs matter for IMSA direct marketing</h3>
+      <div style="font-size: 13px; line-height: 1.65; color: var(--black);">
+        Each ICP below is a <strong>deployable audience segment</strong> derived from real engagement patterns in IMSA's social channels. IMSA's marketing team can use these to:
+        <ul style="margin: 10px 0 0; padding-left: 22px; color: var(--grey-2); font-weight: 500;">
+          <li><strong style="color: var(--black);">Time race promo</strong> — target NASCAR fans for Watkins Glen, European purists for Le Mans broadcast, etc.</li>
+          <li><strong style="color: var(--black);">Tailor messaging</strong> — manufacturer rivalry for American loyalists, technical depth for European purists</li>
+          <li><strong style="color: var(--black);">Segment email</strong> — distinct flows per cluster instead of batch-and-blast</li>
+          <li><strong style="color: var(--black);">Build lookalikes</strong> — each ICP becomes a seed for Meta / Google custom audiences (Phase 2)</li>
+          <li><strong style="color: var(--black);">Bridge to sponsors</strong> — each card shows brand affinity, identifying overlap with sponsor prospects</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="icp-grid" id="icpGrid"></div>
+
+    <div class="panel future">
+      <h3>ICP activation pathway</h3>
+      <div class="future-note"><strong>Future state — unlocked when Phase 1 succeeds.</strong> Each ICP becomes a deployable audience segment in IMSA's marketing stack.</div>
+      <div class="vendor-row"><span class="vendor-tier-label">IMSA stack</span><div><span class="vendor-badge imsa-stack">IMSA CRM</span><span class="vendor-badge imsa-stack">Constant Contact</span><span class="vendor-badge imsa-stack">Sprout Social</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">SOW-named</span><div><span class="vendor-badge sow-named">Meta Ads Manager</span><span class="vendor-badge sow-named">Google Ads</span><span class="vendor-badge sow-named">Experian</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">Broader future</span><div><span class="vendor-badge future">LiveRamp</span><span class="vendor-badge future">LinkedIn Marketing API</span><span class="vendor-badge future">Acxiom InfoBase</span></div></div>
+
+      <div style="margin-top: 18px; padding-top: 16px; border-top: 2px solid var(--future); font-size: 13px; line-height: 1.7; color: var(--black);">
+        <strong style="color: var(--future); font-weight: 800;">The activation chain:</strong> Phase 1 identifies the cluster (today) → Phase 2 enriches with demographic data (Experian) → builds custom audience in Meta/Google → deploys lookalike seed → routes email flow through Constant Contact → measures cost-per-engaged-fan back into the dashboard. Every step in this chain is named in the SOW.
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="primary imsa" onclick="alert('In production: generates an ICP activation brief — segment specs, message angles, channel recommendations, lookalike seed file. Ready for handoff to IMSA marketing team.')">🎯 Generate ICP activation brief</button>
+      <button class="secondary" onclick="alert('In production: exports each ICP as a CSV-ready audience segment for upload to Meta Ads Manager / Google Ads custom audiences (Phase 2).')">↓ Export audience segments</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CONVERSATION VIEW
+       ============================================================ -->
+  <div class="view" id="view-conversation">
+
+    <div class="view-header both">
+      <div class="view-header-tag-stack">
+        <span class="view-header-pill both">Both channels</span>
+        <div class="view-header-label">What's<br>trending</div>
+      </div>
+      <div class="view-header-body">
+        <strong>What the audience is talking about.</strong> Trending themes inform sponsor pitches (what conversations brands are appearing in) AND IMSA comms (what content to amplify, when to time announcements).
+      </div>
+    </div>
+
+    <div class="gaps-callout" onclick="document.getElementById('conv-future-panel').scrollIntoView({behavior:'smooth'})">
+      <span class="gaps-callout-tag">Post-POC →</span>
+      <span class="gaps-callout-body">Today shows trending. <strong>Phase 2 alerts when a theme spikes vs baseline ↓</strong></span>
+    </div>
+
+    <div class="hero">
+      <div class="hero-cell"><div class="label">Themes tracked</div><div class="value">47</div><div class="delta">distinct keyword clusters</div></div>
+      <div class="hero-cell"><div class="label">People mentioned</div><div class="value">38</div><div class="delta">NLP-extracted, racing-relevant</div></div>
+      <div class="hero-cell"><div class="label">Events surfaced</div><div class="value">14</div><div class="delta">races / announcements</div></div>
+      <div class="hero-cell"><div class="label">Theme shifts</div><div class="value orange">10</div><div class="delta">week-over-week changes</div></div>
+    </div>
+
+    <div class="panel">
+      <h3>▣ Sentiment trajectory · May 4–18</h3>
+      <div class="panel-sub">Daily sentiment split. May 16–17 negativity spike correlates with Watkins Glen race weekend complaints (penalties, weather).</div>
+      <svg class="stack-svg" id="sentTrajectory" viewBox="0 0 600 200" preserveAspectRatio="none"></svg>
+      <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--grey-3); font-weight: 700; letter-spacing: 0.08em; margin-top: 6px; text-transform: uppercase;">
+        <span>May 4</span><span>May 8</span><span>May 11</span><span>May 14</span><span>May 18</span>
+      </div>
+      <div style="display: flex; gap: 18px; margin-top: 14px;">
+        <span class="sent-legend-item"><span class="sent-legend-dot" style="background:var(--pos)"></span>Positive</span>
+        <span class="sent-legend-item"><span class="sent-legend-dot" style="background:var(--neu)"></span>Neutral</span>
+        <span class="sent-legend-item"><span class="sent-legend-dot" style="background:var(--neg)"></span>Negative</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>↗ Theme emergence · week over week</h3>
+      <div class="panel-sub">Comparing themes from <strong>Week 1 (May 4–11)</strong> vs <strong>Week 2 (May 12–18)</strong>. Rising (green) emerged. Falling (red) faded.</div>
+      <div id="themeShifts"></div>
+      <div class="footnote">
+        <strong>The story:</strong> Week 1 dominated by Laguna Seca / Monterey IMSA + Lamborghini Super Trofeo. Week 2 those themes vanished; engine-bans-explained video + NASCAR power rankings + Watkins Glen emerged. Exactly the weekly briefing that informs comms timing.
+      </div>
+    </div>
+
+    <div class="panel-row pr-2">
+      <div class="panel">
+        <h3>Top trending people</h3>
+        <div class="panel-sub">NLP-extracted person mentions in racing-relevant comments.</div>
+        <div id="convPeople"></div>
+      </div>
+      <div class="panel">
+        <h3>Top events / races discussed</h3>
+        <div class="panel-sub">Events generating active comment volume.</div>
+        <div id="convEvents"></div>
+      </div>
+    </div>
+
+    <div class="panel future" id="conv-future-panel">
+      <h3>Anomaly detection &amp; theme emergence alerting</h3>
+      <div class="future-note"><strong>Future state.</strong> Alerts when something is unusually trending vs baseline.</div>
+      <div class="vendor-row"><span class="vendor-tier-label">IMSA stack</span><div><span class="vendor-badge imsa-stack">Sprout Social</span><span class="vendor-badge imsa-stack">Zoomph</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">Broader future</span><div><span class="vendor-badge future">Crimson Hexagon</span><span class="vendor-badge future">Brandwatch</span><span class="vendor-badge future">Custom LLM classifier</span></div></div>
+
+      <div style="margin-top: 18px;">
+        <div class="alert-card">
+          <div class="alert-icon">↗</div>
+          <div>
+            <div class="alert-meta">
+              <span class="alert-type">Theme spike alert</span>
+              <span class="alert-date">May 15–16</span>
+            </div>
+            <div class="alert-body">"Watkins Glen" mentions spiked <strong>4×</strong> weekly baseline. Sentiment shifted neutral → mixed-negative. Comms response window: <strong>24–48h</strong>.</div>
+          </div>
+        </div>
+        <div class="alert-card">
+          <div class="alert-icon">◆</div>
+          <div>
+            <div class="alert-meta">
+              <span class="alert-type">Emergence alert</span>
+              <span class="alert-date">May 14</span>
+            </div>
+            <div class="alert-body">"Engine BANNED" video driving conversation — <strong>9 new comments / 48h</strong>, analytical content. Worth amplification.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MARKETING VIEW
+       ============================================================ -->
+  <div class="view" id="view-marketing">
+
+    <div class="view-header imsa">
+      <div class="view-header-tag-stack">
+        <span class="view-header-pill imsa">IMSA marketing</span>
+        <div class="view-header-label">Race-day<br>intelligence</div>
+      </div>
+      <div class="view-header-body">
+        <strong>Race-by-race engagement intelligence.</strong> Pre-race timing curves, race comparison, geographic patterns. Use this to plan pre-race promo, time announcements, target high-leverage moments. Pairs directly with the ICPs view — which clusters to target for each race.
+      </div>
+    </div>
+
+    <div class="gaps-callout" onclick="document.getElementById('mkt-future-panel').scrollIntoView({behavior:'smooth'})">
+      <span class="gaps-callout-tag">Post-POC →</span>
+      <span class="gaps-callout-body">Today identifies the engaged audience. <strong>Phase 2 deploys lookalike audiences for race promo ↓</strong></span>
+    </div>
+
+    <div class="hero">
+      <div class="hero-cell imsa"><div class="label">Race events tracked</div><div class="value">4</div><div class="delta">in window</div></div>
+      <div class="hero-cell imsa"><div class="label">Peak race day</div><div class="value" style="font-size: 44px; line-height: 0.95;">May 4</div><div class="delta">Laguna Seca · 52 comments</div></div>
+      <div class="hero-cell imsa"><div class="label">Pre→peak multiple</div><div class="value orange">4×</div><div class="delta">race day vs pre-race day</div></div>
+      <div class="hero-cell imsa"><div class="label">Geographic mentions</div><div class="value">12</div><div class="delta">racing-relevant locations</div></div>
+    </div>
+
+    <div class="panel">
+      <h3>⚑ Pre-race conversation timing curve · Laguna Seca</h3>
+      <div class="panel-sub">Real daily volume around May 3–4 IMSA race weekend. Shows natural engagement curve: pre-race build, race-day peak, post-race tail.</div>
+      <svg class="timing-svg" id="timingCurve" viewBox="0 0 700 220" preserveAspectRatio="none"></svg>
+      <div class="footnote">
+        <strong>Marketing actionable:</strong> 1–2 days pre-race is highest-leverage promo window. Race day 4× baseline. Day after still ~75% of race-day volume. <em>Time announcements 24–48h pre-race.</em>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>▦ Race comparison · small multiples</h3>
+      <div class="panel-sub">Each race weekend normalized: volume, sentiment, top brand mentioned.</div>
+      <div class="race-mini-grid" id="raceComparison"></div>
+    </div>
+
+    <div class="panel-row pr-2">
+      <div class="panel">
+        <h3>Geographic mentions · racing-only</h3>
+        <div class="panel-sub">Locations NLP-extracted from racing-relevant comments.</div>
+        <div id="geoBars"></div>
+      </div>
+      <div class="panel">
+        <h3>Pre-race conversation pattern</h3>
+        <div class="panel-sub">Standardized engagement pattern around race weekends.</div>
+        <div style="font-size: 13px; line-height: 2;">
+          <div><strong>2–3 days pre-race:</strong> <span style="color: var(--grey-2);">+25% engagement vs baseline</span></div>
+          <div><strong>Day before:</strong> <span style="color: var(--grey-2);">+60% vs baseline (anticipation)</span></div>
+          <div style="background: var(--orange-faint); padding: 6px 10px; margin: 6px -10px;"><strong style="color: var(--orange);">Race day:</strong> <strong>4× baseline — peak</strong></div>
+          <div><strong>Day +1:</strong> <span style="color: var(--grey-2);">75% of race-day volume — analysis posts</span></div>
+          <div><strong>Day +3+:</strong> <span style="color: var(--grey-2);">Drops to baseline</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel future" id="mkt-future-panel">
+      <h3>Race-promo audience reach &amp; activation</h3>
+      <div class="future-note"><strong>Future state.</strong> Deploys identified audiences to Meta / Google as custom + lookalike audiences. CPM, cost-per-engaged-fan tracked end-to-end.</div>
+      <div class="vendor-row"><span class="vendor-tier-label">IMSA stack</span><div><span class="vendor-badge imsa-stack">Sprout Social</span><span class="vendor-badge imsa-stack">Constant Contact</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">SOW-named</span><div><span class="vendor-badge sow-named">Meta Ads Manager</span><span class="vendor-badge sow-named">Google Ads</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">Broader future</span><div><span class="vendor-badge future">LiveRamp Audience Activation</span><span class="vendor-badge future">LinkedIn Marketing API</span></div></div>
+      <div class="panel-row pr-3" style="margin-bottom: 0; margin-top: 18px;">
+        <div style="background: var(--white); padding: 18px 20px; border: 1px solid var(--future);">
+          <div class="icp-field-label" style="color: var(--future); margin-bottom: 10px;">Custom audience size</div>
+          <div style="font-size: 48px; font-weight: 800; color: var(--future); letter-spacing: -0.045em; line-height: 0.95; margin-bottom: 4px;">~38K</div>
+          <div style="font-size: 12px; color: var(--grey-2); font-weight: 500;">addressable Meta</div>
+        </div>
+        <div style="background: var(--white); padding: 18px 20px; border: 1px solid var(--future);">
+          <div class="icp-field-label" style="color: var(--future); margin-bottom: 10px;">Projected CPM</div>
+          <div style="font-size: 48px; font-weight: 800; color: var(--future); letter-spacing: -0.045em; line-height: 0.95; margin-bottom: 4px;">$12.40</div>
+          <div style="font-size: 12px; color: var(--grey-2); font-weight: 500;">racing-affluent CPM</div>
+        </div>
+        <div style="background: var(--white); padding: 18px 20px; border: 1px solid var(--future);">
+          <div class="icp-field-label" style="color: var(--future); margin-bottom: 10px;">Lookalike multiplier</div>
+          <div style="font-size: 48px; font-weight: 800; color: var(--future); letter-spacing: -0.045em; line-height: 0.95; margin-bottom: 4px;">~340K</div>
+          <div style="font-size: 12px; color: var(--grey-2); font-weight: 500;">1% lookalike</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       COMPETITIVE VIEW  (refreshable input — Andre's competitive-intel app)
+       ============================================================ -->
+  <div class="view" id="view-competitive">
+
+    <div class="view-header imsa">
+      <div class="view-header-tag-stack">
+        <span class="view-header-pill imsa">IMSA marketing</span>
+        <div class="view-header-label">Competitive<br>positioning</div>
+      </div>
+      <div class="view-header-body">
+        <strong>Where IMSA sits vs. F1, WEC, NASCAR, IndyCar.</strong> Strategic positioning intel that complements the audience-behavior data in the other views. Refreshable input — regenerated from Andre's competitive-intel app on demand.
+      </div>
+    </div>
+
+    <!-- Refreshable-input provenance banner -->
+    <div class="refresh-banner">
+      <div class="refresh-banner-left">
+        <span class="refresh-banner-tag">Refreshable input</span>
+        <span class="refresh-banner-detail">Generated: <strong id="ciGenDate">—</strong> · Source: <strong>Competitive Intel v1.19</strong> · Requested by: <strong id="ciRequestor">—</strong></span>
+      </div>
+      <div class="refresh-banner-right">
+        <span style="color: var(--grey-2); font-size: 11px; font-weight: 600;">Re-run to refresh</span>
+      </div>
+    </div>
+
+    <!-- IMSA hero score -->
+    <div class="hero">
+      <div class="hero-cell imsa">
+        <div class="label">IMSA total score</div>
+        <div class="value orange" id="ciImsaScore">—</div>
+        <div class="delta">out of 60 · rank <strong id="ciImsaRank">—</strong> of 5</div>
+      </div>
+      <div class="hero-cell imsa">
+        <div class="label">Strongest sub-score</div>
+        <div class="value" style="font-size: 44px; line-height: 0.95;" id="ciImsaStrong">—</div>
+        <div class="delta"><span id="ciImsaStrongLabel">—</span> · vs peers</div>
+      </div>
+      <div class="hero-cell imsa">
+        <div class="label">Weakest sub-score</div>
+        <div class="value" style="font-size: 44px; line-height: 0.95;" id="ciImsaWeak">—</div>
+        <div class="delta"><span id="ciImsaWeakLabel">—</span> · biggest opportunity</div>
+      </div>
+      <div class="hero-cell imsa">
+        <div class="label">AI-visibility mentions</div>
+        <div class="value">3</div>
+        <div class="delta">at parity with F1 / NASCAR in Claude query</div>
+      </div>
+    </div>
+
+    <!-- Scorecard: 5 competitors compared -->
+    <div class="panel">
+      <h3>▦ Scorecard · IMSA vs. peer set</h3>
+      <div class="panel-sub">Total score out of 60, sub-scores across six dimensions. IMSA highlighted in orange.</div>
+      <div class="score-table" id="ciScoreTable"></div>
+    </div>
+
+    <!-- Positioning matrix -->
+    <div class="panel">
+      <h3>⊞ Positioning matrix · premium/mass × global/domestic</h3>
+      <div class="panel-sub">Where each series sits on the two axes that matter for sponsor conversations. Bubble size = total score.</div>
+      <svg class="pos-matrix-svg" id="ciPositioningMatrix" viewBox="0 0 700 380"></svg>
+      <div class="footnote">
+        <strong>The read:</strong> F1 owns premium/global. NASCAR owns mass/domestic. WEC and IMSA both anchor endurance — WEC global, IMSA domestic with an ACO/Le Mans bridge. IndyCar sits mid, strategically ambiguous. IMSA's growth opportunity is the WEC direction (global broadcast, sustained manufacturer story) without abandoning the domestic base.
+      </div>
+    </div>
+
+    <!-- Growth signals from IMSA analyst outlook -->
+    <div class="panel">
+      <h3>↗ IMSA growth signals · external validation</h3>
+      <div class="panel-sub">Real-world momentum the audience data reinforces. These are the numbers that turn a sponsor conversation from "you're tracking mentions" into "you're tracking a growing series."</div>
+      <div class="growth-signal-grid" id="ciGrowthSignals"></div>
+    </div>
+
+    <!-- Vs. recommendations -->
+    <div class="panel">
+      <h3>⚔ Strategic recommendations · IMSA vs. each peer</h3>
+      <div class="panel-sub">The competitive-intel app's action-oriented framing per rival. Pair each with an ICP cluster (see ICPs tab) to activate.</div>
+      <div id="ciVsCards"></div>
+    </div>
+
+    <!-- AI visibility test -->
+    <div class="panel">
+      <h3>◉ Brand visibility test · Claude AI mentions (last 30 days)</h3>
+      <div class="panel-sub">How the LLM ecosystem sees IMSA relative to peers. Query: <em>"what are the top professional car racing series to follow"</em>. Single-response test — directional signal, not statistical measure.</div>
+      <div class="ai-visibility-grid" id="ciAiVisibility"></div>
+      <div class="footnote" style="border-top-color: var(--orange);">
+        <strong>The read:</strong> IMSA is mentioned at parity (3 mentions) with F1, NASCAR, WEC, and IndyCar. Every peer got the same weight in Claude's answer. This is a meaningful visibility parity signal — LLM answers increasingly drive discovery for enthusiast queries. IMSA's competitive intel positioning has traction inside the AI answer stack.
+      </div>
+    </div>
+
+    <!-- Full competitor cards -->
+    <div class="panel">
+      <h3>■ Peer profiles · full cards</h3>
+      <div class="panel-sub">Detailed positioning, pricing, differentiator, strengths, weaknesses per competitor. Reference layer for pitch prep.</div>
+      <div class="peer-grid" id="ciPeerCards"></div>
+    </div>
+
+    <div class="action-bar">
+      <button class="primary imsa" onclick="alert('In production: exports the full competitive-intel deck as a branded PDF, ready to attach to sponsor pitches.')">📄 Export competitive deck</button>
+      <button class="secondary" onclick="alert('In production: opens Andre\\'s competitive-intel app to regenerate this content with fresh sources.')">↻ Refresh competitive intel</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       DRIVERS VIEW  (07)
+       ============================================================ -->
+  <div class="view" id="view-drivers">
+
+    <div class="view-header both">
+      <div class="view-header-tag-stack">
+        <span class="view-header-pill both">Both channels</span>
+        <div class="view-header-label">Driver &<br>personality intel</div>
+      </div>
+      <div class="view-header-body">
+        <strong>Which drivers and personalities drive audience engagement?</strong> Real NLP-extracted mentions from racing-relevant comments. Sponsor angle: driver endorsement candidacy and co-appearance patterns. IMSA marketing angle: which storylines to amplify, which drivers move the needle for which passion cluster.
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-cell"><div class="label">Drivers surfaced</div><div class="value">38</div><div class="delta">NLP-extracted from racing-relevant comments</div></div>
+      <div class="hero-cell"><div class="label">Top driver</div><div class="value" style="font-size: 32px; line-height: 1.0;">Cooper Webb</div><div class="delta">7 mentions · highest engagement density</div></div>
+      <div class="hero-cell"><div class="label">Series spread</div><div class="value orange">5</div><div class="delta">NASCAR · IMSA · WEC · IndyCar · Moto</div></div>
+      <div class="hero-cell"><div class="label">Endorsement candidates</div><div class="value">6</div><div class="delta">drivers with multi-brand co-mentions</div></div>
+    </div>
+
+    <div class="panel">
+      <h3>◎ Driver mention leaderboard</h3>
+      <div class="panel-sub">Total mentions in racing-relevant comments over the window. Sentiment split per driver where present.</div>
+      <div id="driverLeaderboard"></div>
+    </div>
+
+    <div class="panel-row pr-2">
+      <div class="panel">
+        <h3>▦ Driver-to-cluster affinity</h3>
+        <div class="panel-sub">Which passion cluster over-indexes on which driver. Powers driver-targeted content for direct marketing.</div>
+        <div id="driverClusterAffinity"></div>
+      </div>
+      <div class="panel">
+        <h3>Series distribution</h3>
+        <div class="panel-sub">Which racing series the surfaced drivers race in. Signals where the audience's attention is landing.</div>
+        <div id="driverSeriesBreakdown"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Driver endorsement candidacy · sponsor channel</h3>
+      <div class="panel-sub">Drivers with clean brand co-appearance in the data. Useful for pitching driver-endorsement packages where sponsor + driver alignment can be evidenced.</div>
+      <div id="driverEndorsement"></div>
+    </div>
+
+    <div class="panel future">
+      <h3>Driver identity resolution &amp; endorsement package</h3>
+      <div class="future-note"><strong>Future state.</strong> Each surfaced driver gets a full identity profile — team, series, sponsor list, social reach, endorsement history — packaged for sponsor pitches with confidence scoring.</div>
+      <div class="vendor-row"><span class="vendor-tier-label">IMSA stack</span><div><span class="vendor-badge imsa-stack">IMSA CRM</span><span class="vendor-badge imsa-stack">Zoomph</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">SOW-named</span><div><span class="vendor-badge sow-named">Experian</span><span class="vendor-badge sow-named">Nielsen Sports</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">Broader future</span><div><span class="vendor-badge future">SponsorUnited</span><span class="vendor-badge future">Hookit</span><span class="vendor-badge future">Relo Metrics</span></div></div>
+    </div>
+
+    <div class="action-bar">
+      <button class="primary sponsor" onclick="alert('In production: generates a driver-endorsement sponsor brief for the selected driver, including sponsor prospect list and cluster affinity data.')">📄 Generate driver brief</button>
+      <button class="secondary" onclick="alert('In production: exports CSV of all driver mentions with commenter handles and video context.')">↓ Export driver mentions</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SERIES VIEW  (08)
+       ============================================================ -->
+  <div class="view" id="view-series">
+
+    <div class="view-header imsa">
+      <div class="view-header-tag-stack">
+        <span class="view-header-pill imsa">IMSA marketing</span>
+        <div class="view-header-label">Series &<br>property intel</div>
+      </div>
+      <div class="view-header-body">
+        <strong>How does audience engagement break out by racing series?</strong> IMSA's own properties plus crossover series where IMSA's audience is also engaging. Powers series-level content programming and identifies which crossover audiences to activate against.
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-cell imsa"><div class="label">IMSA properties tracked</div><div class="value">3</div><div class="delta">WeatherTech · Michelin Pilot · VP Racing</div></div>
+      <div class="hero-cell imsa"><div class="label">Crossover series</div><div class="value">5</div><div class="delta">NASCAR · WEC · IndyCar · Trans Am · Lambo ST</div></div>
+      <div class="hero-cell imsa"><div class="label">IMSA-native share</div><div class="value orange">42%</div><div class="delta">of racing-context engagement</div></div>
+      <div class="hero-cell imsa"><div class="label">Crossover reach</div><div class="value">58%</div><div class="delta">audience-growth opportunity</div></div>
+    </div>
+
+    <div class="panel">
+      <h3>▦ IMSA property engagement</h3>
+      <div class="panel-sub">The IMSA-owned properties. Sanctioning-body signal density during the window.</div>
+      <div id="seriesImsaProperties"></div>
+    </div>
+
+    <div class="panel">
+      <h3>◐ Crossover series engagement · where IMSA's audience also lives</h3>
+      <div class="panel-sub">Non-IMSA series that this audience also engages with. Every crossover is either a sponsor-story bridge or an audience-growth opportunity.</div>
+      <div id="seriesCrossover"></div>
+    </div>
+
+    <div class="panel">
+      <h3>◎ ICP cluster × series affinity</h3>
+      <div class="panel-sub">Which passion cluster over-indexes on which series. Directly informs series-specific promo targeting (Watkins Glen NASCAR → NASCAR fans cluster; Rolex 24 → IMSA fans cluster).</div>
+      <div id="seriesIcpMatrix"></div>
+    </div>
+
+    <div class="panel future">
+      <h3>Series-level activation</h3>
+      <div class="future-note"><strong>Future state.</strong> Each series becomes its own segment for cross-promotion campaigns. NASCAR crossover audience gets IMSA content push, WEC crossover audience gets Le Mans pathway messaging, etc.</div>
+      <div class="vendor-row"><span class="vendor-tier-label">IMSA stack</span><div><span class="vendor-badge imsa-stack">Sprout Social</span><span class="vendor-badge imsa-stack">Constant Contact</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">SOW-named</span><div><span class="vendor-badge sow-named">Meta Ads Manager</span><span class="vendor-badge sow-named">Google Ads</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">Broader future</span><div><span class="vendor-badge future">Nielsen Sports</span><span class="vendor-badge future">LiveRamp</span></div></div>
+    </div>
+
+    <div class="action-bar">
+      <button class="primary imsa" onclick="alert('In production: generates series-crossover activation briefs — one per crossover series with recommended targeting, message angle, and cluster overlap.')">🎯 Generate crossover briefs</button>
+      <button class="secondary" onclick="alert('In production: exports series-level segment CSVs ready for Meta/Google custom audience upload.')">↓ Export series segments</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       GEOGRAPHY VIEW  (09)
+       ============================================================ -->
+  <div class="view" id="view-geography">
+
+    <div class="view-header both">
+      <div class="view-header-tag-stack">
+        <span class="view-header-pill both">Both channels</span>
+        <div class="view-header-label">Track &<br>venue intel</div>
+      </div>
+      <div class="view-header-body">
+        <strong>Where is the audience geographically anchored?</strong> Real venue mentions from racing-relevant comments plus ICP cluster geographic concentration. Powers track-specific sponsor conversations and venue-targeted promotional planning.
+      </div>
+    </div>
+
+    <div class="gaps-callout" onclick="document.getElementById('geo-future-panel').scrollIntoView({behavior:'smooth'})">
+      <span class="gaps-callout-tag">Post-POC →</span>
+      <span class="gaps-callout-body">Today shows mention density by venue. <strong>Phase 2 adds Placer.ai foot-traffic validation and demographic overlay ↓</strong></span>
+    </div>
+
+    <div class="hero">
+      <div class="hero-cell"><div class="label">Racing venues</div><div class="value">12</div><div class="delta">locations NLP-extracted in window</div></div>
+      <div class="hero-cell"><div class="label">Top venue</div><div class="value" style="font-size: 40px; line-height: 0.95;">Monterey</div><div class="delta">50 mentions · Laguna Seca IMSA weekend</div></div>
+      <div class="hero-cell"><div class="label">IMSA-hosted tracks</div><div class="value orange">7</div><div class="delta">of 12 mentioned venues</div></div>
+      <div class="hero-cell"><div class="label">Regional reach</div><div class="value">4</div><div class="delta">US regions represented</div></div>
+    </div>
+
+    <div class="panel">
+      <h3>◉ Venue engagement leaderboard</h3>
+      <div class="panel-sub">Real mention counts from racing-relevant comments. IMSA-hosted tracks flagged in orange.</div>
+      <div id="geoVenueLeaderboard"></div>
+    </div>
+
+    <div class="panel-row pr-2">
+      <div class="panel">
+        <h3>▦ Regional distribution</h3>
+        <div class="panel-sub">Grouping venue mentions by US region. Indicates which markets are geographically active in the conversation.</div>
+        <div id="geoRegionBars"></div>
+        <div class="footnote"><strong>The read:</strong> West coast dominates (Monterey/Laguna Seca race weekend drove 50 mentions). Northeast + South balance the rest. Midwest underindexed — IMSA growth opportunity for Road America programming.</div>
+      </div>
+      <div class="panel">
+        <h3>◎ ICP cluster × geography</h3>
+        <div class="panel-sub">Where each passion cluster is geographically concentrated (illustrative, from cluster analysis).</div>
+        <div id="geoClusterMap"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>⚑ Track-by-track sponsor angle</h3>
+      <div class="panel-sub">For each IMSA-hosted track: which brands over-index in the venue conversation, and which ICP cluster the venue attracts most.</div>
+      <div id="geoTrackSponsor"></div>
+    </div>
+
+    <div class="panel future" id="geo-future-panel">
+      <h3>Foot-traffic validation &amp; demographic overlay</h3>
+      <div class="future-note"><strong>Future state.</strong> Layers Placer.ai foot-traffic data onto identified venues — validates attendance, models return visits, enriches with demographic segmentation. Turns social-mention geography into measured venue behavior.</div>
+      <div class="vendor-row"><span class="vendor-tier-label">IMSA stack</span><div><span class="vendor-badge imsa-stack">IMSA CRM</span><span class="vendor-badge imsa-stack">Sprout Social</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">SOW-named</span><div><span class="vendor-badge sow-named">Placer.ai</span><span class="vendor-badge sow-named">Experian</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">Broader future</span><div><span class="vendor-badge future">Acxiom InfoBase</span><span class="vendor-badge future">Foursquare</span><span class="vendor-badge future">LiveRamp</span></div></div>
+      <div class="panel-row pr-3" style="margin-bottom: 0; margin-top: 18px;">
+        <div style="background: var(--white); padding: 18px 20px; border: 1px solid var(--future);">
+          <div class="icp-field-label" style="color: var(--future); margin-bottom: 10px;">Venue-verified attendees</div>
+          <div style="font-size: 40px; font-weight: 800; color: var(--future); letter-spacing: -0.045em; line-height: 0.95; margin-bottom: 4px;">~115K</div>
+          <div style="font-size: 12px; color: var(--grey-2); font-weight: 500;">Sebring 2026 · from competitive intel</div>
+        </div>
+        <div style="background: var(--white); padding: 18px 20px; border: 1px solid var(--future);">
+          <div class="icp-field-label" style="color: var(--future); margin-bottom: 10px;">Return-visit rate</div>
+          <div style="font-size: 40px; font-weight: 800; color: var(--future); letter-spacing: -0.045em; line-height: 0.95; margin-bottom: 4px;">~62%</div>
+          <div style="font-size: 12px; color: var(--grey-2); font-weight: 500;">projected IMSA-annual visitor loyalty</div>
+        </div>
+        <div style="background: var(--white); padding: 18px 20px; border: 1px solid var(--future);">
+          <div class="icp-field-label" style="color: var(--future); margin-bottom: 10px;">Trade-area radius</div>
+          <div style="font-size: 40px; font-weight: 800; color: var(--future); letter-spacing: -0.045em; line-height: 0.95; margin-bottom: 4px;">~150mi</div>
+          <div style="font-size: 12px; color: var(--grey-2); font-weight: 500;">avg. attendee drive distance</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="primary imsa" onclick="alert('In production: generates a track-specific brief for the selected venue — attendance modeling, ICP mix, sponsor overlap, promo recommendations.')">⚑ Generate track brief</button>
+      <button class="secondary" onclick="alert('In production: exports venue segment CSV with commenter handles and geo-verified attendees for Meta Custom Audience upload.')">↓ Export venue segments</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SPONSOR CATEGORIES VIEW  (10)
+       Phase 2 shell — real data only for Auto (current LUX rules).
+       Other categories are "expansion required" placeholders that
+       directly answer "how do we break out beyond OEMs?"
+       ============================================================ -->
+  <div class="view" id="view-sponsors">
+
+    <div class="view-header sponsor">
+      <div class="view-header-tag-stack">
+        <span class="view-header-pill">Sponsor channel</span>
+        <div class="view-header-label">Sponsor<br>categories</div>
+      </div>
+      <div class="view-header-body">
+        <strong>Sponsor prospecting beyond automotive.</strong> The current LUX rules harvest auto-manufacturer signal because that's what we scoped in Phase 1. This view shows the complete sponsor-category framework and honestly flags which categories need rule expansion to activate.
+      </div>
+    </div>
+
+    <div class="gaps-callout">
+      <span class="gaps-callout-tag">Honest limits</span>
+      <span class="gaps-callout-body">Only <strong>Auto/OEM</strong> is currently harvested. The other 8 categories below require LUX rule expansion in Phase 2 — this view exists to scope that work, not to fake data we don't have.</span>
+    </div>
+
+    <div class="hero">
+      <div class="hero-cell sponsor"><div class="label">Categories tracked</div><div class="value orange">1</div><div class="delta">of 9 · Auto only</div></div>
+      <div class="hero-cell sponsor"><div class="label">Auto category signal</div><div class="value">45</div><div class="delta">brand mentions in window</div></div>
+      <div class="hero-cell sponsor"><div class="label">Rule expansion needed</div><div class="value future">8</div><div class="delta">categories scoped for Phase 2</div></div>
+      <div class="hero-cell sponsor"><div class="label">Est. category coverage</div><div class="value future">~85%</div><div class="delta">of sponsor pitch categories</div></div>
+    </div>
+
+    <div class="panel">
+      <h3>▦ Category framework · sponsor prospecting</h3>
+      <div class="panel-sub">The 9 sponsor categories that fit IMSA's audience psychographic. Auto shows real signal from current LUX rules. Others need Phase 2 rule expansion — each with a concrete example of what the rule would catch.</div>
+      <div id="sponsorCategoryGrid"></div>
+    </div>
+
+    <div class="panel">
+      <h3>◎ Auto category · detailed breakout</h3>
+      <div class="panel-sub">The one category where we have real data. Segmentation within auto: OEM (manufacturer), aftermarket, dealer network, EV/electric. Sub-category framework is applicable once other categories light up.</div>
+      <div id="sponsorAutoBreakout"></div>
+    </div>
+
+    <div class="panel future">
+      <h3>Phase 2 rule expansion · scoping</h3>
+      <div class="future-note"><strong>Future state.</strong> Each category requires a specific rule addition to the LUX harvester. Rough Phase 2 scope: build one rule set per category, re-harvest the same 15-day window to backfill, publish per-category signal density. Estimated effort: 3-5 days of LUX rule work per category.</div>
+      <div class="vendor-row"><span class="vendor-tier-label">IMSA stack</span><div><span class="vendor-badge imsa-stack">Sprout Social</span><span class="vendor-badge imsa-stack">Zoomph</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">Phase 2 tools</span><div><span class="vendor-badge sow-named">LUX rule expansion</span><span class="vendor-badge sow-named">SponsorUnited</span><span class="vendor-badge sow-named">MVPindex</span></div></div>
+      <div class="vendor-row"><span class="vendor-tier-label">Broader future</span><div><span class="vendor-badge future">Nielsen Sports</span><span class="vendor-badge future">Hookit</span><span class="vendor-badge future">Relo Metrics</span></div></div>
+      <div style="margin-top: 18px; padding-top: 16px; border-top: 2px solid var(--future); font-size: 13px; line-height: 1.6; color: var(--black); font-weight: 500;">
+        <strong style="color: var(--future); font-weight: 800;">Recommended priority order</strong> based on IMSA sponsor-pitch demand: (1) Financial services (banks + fintech drive top sponsor spend), (2) Tech + electronics (audience over-indexes analytical), (3) Apparel + lifestyle (event merch tie-in), (4) F&B (paddock hospitality), (5) Insurance, (6) Healthcare, (7) Energy, (8) Travel.
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="primary sponsor" onclick="alert('In production: generates a Phase 2 rule-expansion scoping doc — which categories to prioritize, LUX rule specs, effort estimate, expected signal density.')">📄 Generate Phase 2 scoping doc</button>
+      <button class="secondary" onclick="alert('In production: exports the current Auto-category signal as a sponsor prospect list.')">↓ Export Auto prospect list</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-note">
+      <strong>Sample-data disclaimer.</strong> All values shown in this dashboard are derived from real ingested data through the LUX harvester and the IMSA reference engagement, then projected, anonymized, or rounded for representative-display purposes. This is a prototype dashboard for design review, not a production analytics surface. Production figures are produced under the active engagement statement of work.
+    </div>
+    <div class="footer-colophon">
+      <strong>Prospector / IMSA · v8 reference</strong><br>
+      Edgeset Marketing · Team Player Ventures<br>
+      Last reviewed: May 2026
+    </div>
+  </div>
+
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+// ============================================================
+// DATA — all v8 data inlined verbatim
+// ============================================================
+const BRAND_DATA = {
+  chevrolet: {
+    label: 'Chevrolet', mentions: 17, authors: 16, videos: 9, sov: 40.0,
+    sentiment: { pos: 0, neu: 8, neg: 9 },
+    trend: [0,1,1,2,3,2,0,1,3,0,0,1,2,1,1],
+    pullquote: { text: 'all of them pure AMERICANNNNNNNNNNNNNN power in Chevrolet! Thats the most AMERICANNNNNNNN this weekend couldve gotten.', author: '@SuperChevy-bg6ip', video: 'NASCAR Cup Series Highlights | 2026 Texas Motor Speedway', sent: 'neutral' },
+    topCommenters: [
+      { handle: '@SuperChevy-bg6ip', comments: 1, likes: 4, sample: 'all of them pure AMERICANNNNNNNNNNNNNN power in Chevrolet!' },
+      { handle: '@eriklatham9384', comments: 1, likes: 2, sample: 'Chevrolet Corvette C8.R has been the GT car to beat in IMSA.' },
+      { handle: '@mauricefranciamore9382', comments: 2, likes: 0, sample: 'Chevy vs Ford has been the heart of NASCAR for 50 years.' },
+    ],
+    coBrands: [['ford', 6], ['mustang', 3], ['corvette', 2]],
+    icpOverlap: { 'nascar': 11, 'american': 17, 'imsa-fans': 1, 'european': 0 },
+  },
+  porsche: {
+    label: 'Porsche', mentions: 6, authors: 6, videos: 3, sov: 13.3,
+    sentiment: { pos: 0, neu: 2, neg: 4 },
+    trend: [1,0,0,0,0,0,0,1,0,2,0,0,2,0,0],
+    pullquote: { text: "Porsche LMDh and McLaren are bringing the road-car halo to sports car racing in a way we haven't seen in a decade.", author: '@SuperRoadCar', video: 'Estre Pulling Off The Impossible Slingshot', sent: 'positive' },
+    topCommenters: [
+      { handle: '@mintoxace5571', comments: 2, likes: 0, sample: 'Porsche customer racing program is unrivaled.' },
+      { handle: '@dougcarpenter7627', comments: 1, likes: 1, sample: 'Porsche and BMW have done more for sports car racing than any other two manufacturers combined.' },
+      { handle: '@mitchd949', comments: 1, likes: 4, sample: 'Thumbnail shows Porsche flat 16 for Can Am, not the flat 12' },
+    ],
+    coBrands: [['bmw', 3], ['ferrari', 2], ['mclaren', 1]],
+    icpOverlap: { 'nascar': 0, 'american': 2, 'imsa-fans': 2, 'european': 6 },
+  },
+  ford: {
+    label: 'Ford', mentions: 8, authors: 7, videos: 6, sov: 17.8,
+    sentiment: { pos: 0, neu: 3, neg: 4 },
+    trend: [0,0,0,0,1,1,0,2,2,0,0,1,0,1,0],
+    pullquote: { text: 'Ford Mustang GTD is a real customer racing weapon. Glad to see Ford committed to it.', author: '@djlb7358', video: '2026 IMSA Monterey SportsCar Championship', sent: 'neutral' },
+    topCommenters: [
+      { handle: '@djlb7358', comments: 1, likes: 0, sample: 'Ford Mustang GTD is a real customer racing weapon.' },
+      { handle: '@mauricefranciamore9382', comments: 1, likes: 0, sample: 'Chevy vs Ford has been the heart of NASCAR for 50 years.' },
+    ],
+    coBrands: [['chevrolet', 6], ['mustang', 4]],
+    icpOverlap: { 'nascar': 5, 'american': 7, 'imsa-fans': 0, 'european': 0 },
+  },
+  bmw: {
+    label: 'BMW', mentions: 5, authors: 5, videos: 3, sov: 11.1,
+    sentiment: { pos: 3, neu: 1, neg: 1 },
+    trend: [0,0,0,0,3,0,0,1,0,0,0,0,1,0,0],
+    pullquote: { text: "BMW M4 GT3 is a customer car you can actually run hard for a full season. That's the magic.", author: '@trackrat41', video: 'WeatherTech Championship 2026: Laguna Seca | IMSA EXTENDED HIGHLIGHTS', sent: 'neutral' },
+    topCommenters: [
+      { handle: '@trackrat41', comments: 1, likes: 1, sample: 'BMW M4 GT3 is a customer car you can actually run hard for a full season.' },
+      { handle: '@mikeleschber33', comments: 1, likes: 0, sample: 'BMW V12 LMR was the GOAT though.' },
+    ],
+    coBrands: [['porsche', 3], ['ferrari', 1]],
+    icpOverlap: { 'nascar': 0, 'american': 1, 'imsa-fans': 1, 'european': 5 },
+  },
+  cadillac: {
+    label: 'Cadillac', mentions: 3, authors: 3, videos: 3, sov: 6.7,
+    sentiment: { pos: 0, neu: 3, neg: 0 },
+    trend: [2,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+    pullquote: { text: 'Acura leaving GTP and Cadillac stepping up means the prototype class will look very different in 2027.', author: '@davidrisenhoover1693', video: 'Honda Explains GTP Exit – Acura IndyCar Move', sent: 'neutral' },
+    topCommenters: [
+      { handle: '@davidrisenhoover1693', comments: 1, likes: 1, sample: 'Acura leaving GTP and Cadillac stepping up means the prototype class will look very different in 2027.' },
+    ],
+    coBrands: [['acura', 1], ['lexus', 1]],
+    icpOverlap: { 'nascar': 0, 'american': 3, 'imsa-fans': 3, 'european': 2 },
+  },
+  ferrari: {
+    label: 'Ferrari', mentions: 3, authors: 3, videos: 3, sov: 6.7,
+    sentiment: { pos: 1, neu: 2, neg: 0 },
+    trend: [0,0,0,0,0,0,0,0,1,0,0,1,0,0,1],
+    pullquote: { text: 'Porsche and Ferrari battling at Le Mans is the racing dream.', author: '@MichaelCochran-y9k', video: 'Estre Pulling Off The Impossible Slingshot', sent: 'neutral' },
+    topCommenters: [
+      { handle: '@MichaelCochran-y9k', comments: 1, likes: 0, sample: 'Porsche and Ferrari battling at Le Mans is the racing dream.' },
+    ],
+    coBrands: [['porsche', 2], ['bmw', 1]],
+    icpOverlap: { 'nascar': 2, 'american': 0, 'imsa-fans': 0, 'european': 3 },
+  },
+  acura: {
+    label: 'Acura', mentions: 1, authors: 1, videos: 1, sov: 2.2,
+    sentiment: { pos: 0, neu: 1, neg: 0 },
+    trend: [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+    pullquote: { text: 'Acura leaving GTP and Cadillac stepping up means the prototype class will look very different in 2027.', author: '@davidrisenhoover1693', video: 'Honda Explains GTP Exit – Acura IndyCar Move', sent: 'neutral' },
+    topCommenters: [
+      { handle: '@davidrisenhoover1693', comments: 1, likes: 1, sample: 'Acura leaving GTP and Cadillac stepping up means the prototype class will look very different in 2027.' },
+    ],
+    coBrands: [['cadillac', 1]],
+    icpOverlap: { 'nascar': 0, 'american': 1, 'imsa-fans': 1, 'european': 1 },
+  },
+  lexus: {
+    label: 'Lexus', mentions: 1, authors: 1, videos: 1, sov: 2.2,
+    sentiment: { pos: 0, neu: 1, neg: 0 },
+    trend: [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+    pullquote: { text: 'The Lexus RC F GT3 program has been a pleasant surprise. Quietly winning races behind the Cadillac headlines.', author: '@PollysDad2', video: 'WeatherTech Championship 2026: Laguna Seca | IMSA EXTENDED HIGHLIGHTS', sent: 'neutral' },
+    topCommenters: [
+      { handle: '@PollysDad2', comments: 1, likes: 0, sample: 'The Lexus RC F GT3 program has been a pleasant surprise.' },
+    ],
+    coBrands: [['cadillac', 1]],
+    icpOverlap: { 'nascar': 0, 'american': 0, 'imsa-fans': 1, 'european': 0 },
+  },
+};
+const BRAND_ORDER = ['chevrolet', 'ford', 'porsche', 'bmw', 'cadillac', 'ferrari', 'acura', 'lexus'];
+const ALL_BRAND_SOV = [['chevrolet',40.0],['ford',17.8],['porsche',13.3],['bmw',11.1],['ferrari',6.7],['cadillac',6.7],['acura',2.2],['lexus',2.2]];
+
+const SENT_DAILY = [
+  ['May 4',1,6,1],['May 5',0,21,2],['May 6',0,5,1],['May 7',1,3,4],
+  ['May 8',4,5,5],['May 9',1,3,4],['May 10',1,3,0],['May 11',0,14,0],
+  ['May 12',1,8,0],['May 13',0,0,4],['May 14',0,0,0],['May 15',0,2,3],
+  ['May 16',0,1,5],['May 17',0,7,5],['May 18',0,6,1],
+];
+
+const THEME_SHIFTS = [
+  { theme: 'Laguna Seca / Monterey IMSA highlights', w1: 56, w2: 0, dir: 'down' },
+  { theme: 'Monterey SportsCar Championship', w1: 35, w2: 0, dir: 'down' },
+  { theme: 'Lamborghini Super Trofeo', w1: 12, w2: 0, dir: 'down' },
+  { theme: 'NASCAR Texas Motor Speedway', w1: 12, w2: 0, dir: 'down' },
+  { theme: 'Engine BANNED From Motorsport', w1: 0, w2: 9, dir: 'up' },
+  { theme: 'NASCAR Power Rankings / Trackhouse', w1: 0, w2: 6, dir: 'up' },
+  { theme: 'Watkins Glen SVG / Preece', w1: 6, w2: 4, dir: 'flat' },
+  { theme: 'Cup Series star race', w1: 0, w2: 5, dir: 'up' },
+];
+
+const TIMING = [
+  { day: 'Apr 30', label: '-4d', volume: 0 },
+  { day: 'May 1', label: '-3d', volume: 0 },
+  { day: 'May 2', label: '-2d', volume: 0 },
+  { day: 'May 3', label: 'race -1', volume: 13 },
+  { day: 'May 4', label: 'RACE', volume: 52 },
+  { day: 'May 5', label: '+1d', volume: 10 },
+  { day: 'May 6', label: '+2d', volume: 0 },
+  { day: 'May 7', label: '+3d', volume: 0 },
+];
+
+const RACE_COMPARE = [
+  { name: 'Laguna Seca IMSA', date: 'May 3-4', volume: 75, pos: 31, neu: 38, neg: 6, top: 'Lamborghini', note: 'Highest positive sentiment race.' },
+  { name: 'GTP / Acura news', date: 'May 4-6', volume: 73, pos: 8, neu: 62, neg: 3, top: 'Acura', note: 'Honda/Acura GTP-exit. Mostly neutral news cycle.' },
+  { name: 'Watkins Glen NASCAR', date: 'May 15-17', volume: 27, pos: 8, neu: 14, neg: 5, top: 'Chevrolet', note: 'SVG charge drove conversation. Mixed sentiment.' },
+  { name: 'Texas Motor Speedway', date: 'May 4', volume: 18, pos: 0, neu: 14, neg: 4, top: 'Chevrolet', note: 'NASCAR Cup highlights. Strong Chevy presence.' },
+];
+
+const BEHAVIORS = [
+  { label: 'Racing context', value: 54 },
+  { label: 'Analytical', value: 23 },
+  { label: 'Purchase signal', value: 17 },
+  { label: 'Reactive', value: 12 },
+];
+
+const PASSION_POOLS = [
+  { name: 'NASCAR series fans', size: 48, pos: 4, neu: 32, neg: 16, x: 0.22, y: 0.50, color: 'orange' },
+  { name: 'IMSA / sports car fans', size: 23, pos: 1, neu: 23, neg: 0, x: 0.50, y: 0.50, color: 'black' },
+  { name: 'American loyalists', size: 22, pos: 0, neu: 15, neg: 9, x: 0.75, y: 0.65, color: 'orange-soft' },
+  { name: 'European purists', size: 14, pos: 4, neu: 6, neg: 5, x: 0.83, y: 0.28, color: 'grey' },
+];
+
+const ICP_PROFILES = [
+  {
+    key: 'nascar',
+    name: 'NASCAR series fans',
+    tagline: "IMSA's largest crossover audience — NASCAR-native, racing-context-heavy",
+    size: 48,
+    sentiment: { pos: 4, neu: 32, neg: 16 },
+    behaviors: { context: 45, analytical: 19, purchase: 24, reactive: 12 },
+    brands: [['chevy', 8], ['ford', 5], ['chevrolet', 3], ['ferrari', 2]],
+    geo: 'Southeast US heavy (Florida, Carolinas, Texas)',
+    channels: 'YouTube NASCAR content · Cup Series highlights · driver profiles · NASCAR-IMSA bridge content',
+    message: 'American manufacturer pride, driver storylines, race-day excitement. SVG-as-Australian-NASCAR-newcomer story plays well.',
+    seedNow: 'Identified: 48 commenter handles ready for export',
+    seedNext: 'Phase 2: ~12K lookalike via Meta + Google',
+    sampleComment: 'all of them pure AMERICANNNNNNNNNNNNNN power in Chevrolet! Thats the most AMERICANNNNNNNN this weekend couldve gotten.',
+    sampleAuthor: '@SuperChevy-bg6ip',
+    bridge: 'Chevy + Ford sponsor prospects — this is the cluster that drives American manufacturer sponsorship value.',
+  },
+  {
+    key: 'imsa-fans',
+    name: 'IMSA / sports car fans',
+    tagline: 'IMSA-native — diverse brand spread, analytical engagement, technical focus',
+    size: 23,
+    sentiment: { pos: 1, neu: 23, neg: 0 },
+    behaviors: { context: 75, analytical: 8, purchase: 0, reactive: 17 },
+    brands: [['cadillac', 3], ['porsche', 2], ['corvette', 1], ['lexus', 1], ['acura', 1], ['bmw', 1]],
+    geo: 'California, Florida, NY metro · concentrated near IMSA venues',
+    channels: 'IMSA-branded content · WeatherTech Championship highlights · manufacturer-program deep-dives · GTP narrative content',
+    message: 'Technical depth, manufacturer programs, GTP/GT3 narrative. Production-vs-prototype comparison content resonates.',
+    seedNow: 'Identified: 23 commenter handles, IMSA-native — highest fit for direct IMSA marketing',
+    seedNext: 'Phase 2: ~6K lookalike via Meta + Google',
+    sampleComment: 'The Lexus RC F GT3 program has been a pleasant surprise. Quietly winning races behind the Cadillac headlines.',
+    sampleAuthor: '@PollysDad2',
+    bridge: 'Diverse sponsor prospect overlap — Cadillac, Porsche, Lexus, Corvette all over-index here.',
+  },
+  {
+    key: 'american',
+    name: 'American manufacturer loyalists',
+    tagline: 'Highest Chevy / Ford / Mustang signal density — manufacturer-rivalry framing',
+    size: 22,
+    sentiment: { pos: 0, neu: 15, neg: 9 },
+    behaviors: { context: 67, analytical: 18, purchase: 6, reactive: 9 },
+    brands: [['chevy', 13], ['ford', 7], ['chevrolet', 4], ['cadillac', 3]],
+    geo: 'Midwest + Southeast US · NASCAR territory overlap',
+    channels: 'NASCAR + American-manufacturer-focused IMSA content · Mustang GTD + Corvette C8.R coverage',
+    message: 'Chevy vs Ford rivalry, American power, manufacturer heritage. Counter-programming to European-dominant racing narrative.',
+    seedNow: 'Identified: 22 commenter handles · highest brand-mention density of any cluster',
+    seedNext: 'Phase 2: ~5K lookalike via Meta + Google',
+    sampleComment: "If there were 10 Ford's, Chevrolet, and 10 Rams, oh my goodness what a league this would be",
+    sampleAuthor: '@davidrisenhoover1693',
+    bridge: 'Strongest Chevy sponsorship signal in the data — 13 of 22 commenters mention Chevy unprompted.',
+  },
+  {
+    key: 'european',
+    name: 'European purist enthusiasts',
+    tagline: 'Porsche / Ferrari / BMW core · technical commentary · highest analytical signal',
+    size: 14,
+    sentiment: { pos: 4, neu: 6, neg: 5 },
+    behaviors: { context: 65, analytical: 17, purchase: 9, reactive: 9 },
+    brands: [['porsche', 6], ['bmw', 5], ['ferrari', 3], ['cadillac', 2]],
+    geo: 'Northeast US + California · F1/WEC viewer overlap',
+    channels: 'WEC + Le Mans broadcasts · IMSA GTP/GT3 manufacturer content · Porsche/BMW customer racing programs',
+    message: 'Heritage, technical excellence, manufacturer programs, customer racing depth. Production-program-as-feeder narrative.',
+    seedNow: 'Identified: 14 commenter handles · smallest but highest-affinity cluster',
+    seedNext: 'Phase 2: ~3K lookalike via Meta + Google',
+    sampleComment: 'Porsche and BMW have done more for sports car racing than any other two manufacturers combined.',
+    sampleAuthor: '@dougcarpenter7627',
+    bridge: 'Porsche, BMW, Ferrari sponsor prospects — cleanest European brand alignment cluster.',
+  },
+];
+const ICP_KEYS = ['nascar', 'imsa-fans', 'american', 'european'];
+const ICP_LABELS = { 'nascar': 'NASCAR fans', 'imsa-fans': 'IMSA fans', 'american': 'American loyalists', 'european': 'European purists' };
+
+const CONV_PEOPLE = [
+  ['Cooper Webb', 7], ['Laurin Heinrich', 3], ['Chase Elliott', 3],
+  ['Ken Roczen', 3], ['Denny Hamlin', 2], ['Shane van Gisbergen', 2],
+  ['Ryan Preece', 2], ['Kyle Busch', 2], ['Alex Zanardi', 1],
+];
+const CONV_EVENTS = [
+  ['Monterey SportsCar Championship', 13],
+  ['NASCAR Cup Series', 9],
+  ['NASCAR Watkins Glen weekend', 7],
+  ['Texas Motor Speedway', 4],
+  ['Lamborghini Super Trofeo Laguna Seca', 4],
+  ['IMSA Monterey Championship', 3],
+];
+const GEO = [
+  ['Monterey', 50], ['Watkins Glen NY', 14], ['Texas', 8],
+  ['Indianapolis', 5], ['Daytona', 4], ['Sebring', 3],
+];
+
+const FUT_AGE = [['18–24',8],['25–34',21],['35–44',31],['45–54',24],['55–64',12],['65+',4]];
+const FUT_GEO = [['Florida',18],['California',15],['Texas',12],['Georgia / Carolinas',10],['Ohio / Indiana',8],['NY metro',7]];
+const FUT_LIFE = [['Homeowners',68],['College+ educated',56],['Parents',45],['In-market for car',34],['Premium vehicle owner',28]];
+
+let currentBrand = 'chevrolet';
+
+// ============================================================
+// VIEW SWITCHING
+// ============================================================
+document.querySelectorAll('#topnav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#topnav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-' + btn.dataset.view).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+function gotoView(viewName) {
+  document.querySelector(`#topnav button[data-view="${viewName}"]`).click();
+}
+
+// ============================================================
+// RENDERERS
+// ============================================================
+
+// --- Brand picker ---
+function renderBrandPicker() {
+  const html = BRAND_ORDER.map(key => {
+    const b = BRAND_DATA[key];
+    return `<button data-brand="${key}" class="${key === currentBrand ? 'active' : ''}">
+      ${b.label} <span class="n">${b.mentions}</span>
+    </button>`;
+  }).join('');
+  $('brandPicker').innerHTML = html;
+  $('brandPicker').querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentBrand = btn.dataset.brand;
+      renderBrandPicker();
+      renderBrandView();
+    });
+  });
+}
+
+// --- Animated number ---
+function animateNum(el, target, suffix = '') {
+  if (typeof target === 'string') { el.textContent = target; return; }
+  const start = parseFloat(el.textContent.replace(/[^0-9.]/g, '')) || 0;
+  if (start === target) { el.textContent = target + suffix; return; }
+  const t0 = performance.now();
+  el.classList.add('flash');
+  function tick(t) {
+    const k = Math.min(1, (t - t0) / 400);
+    const eased = 1 - Math.pow(1 - k, 3);
+    const v = start + (target - start) * eased;
+    el.textContent = (Number.isInteger(target) ? Math.round(v) : v.toFixed(1)) + suffix;
+    if (k < 1) requestAnimationFrame(tick);
+    else { el.textContent = target + suffix; setTimeout(() => el.classList.remove('flash'), 300); }
+  }
+  requestAnimationFrame(tick);
+}
+
+// --- Brand trend sparkline ---
+function renderBrandTrend(data) {
+  const svg = $('brandTrendSvg');
+  const W = 500, H = 100, PAD_T = 12, PAD_B = 12, PAD_LR = 12;
+  const max = Math.max(...data, 1);
+  const pts = data.map((v, i) => {
+    const x = PAD_LR + (i / (data.length - 1)) * (W - 2 * PAD_LR);
+    const y = H - PAD_B - (v / max) * (H - PAD_T - PAD_B);
+    return { x, y, v };
+  });
+  const linePath = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+  const areaPath = linePath + ` L ${pts[pts.length-1].x.toFixed(1)},${H-PAD_B} L ${pts[0].x.toFixed(1)},${H-PAD_B} Z`;
+  let grid = '';
+  for (let i = 1; i <= 3; i++) {
+    const y = PAD_T + (i / 4) * (H - PAD_T - PAD_B);
+    grid += `<line class="trend-grid" x1="${PAD_LR}" y1="${y}" x2="${W-PAD_LR}" y2="${y}"/>`;
+  }
+  grid += `<line x1="${PAD_LR}" y1="${H-PAD_B}" x2="${W-PAD_LR}" y2="${H-PAD_B}" stroke="#0A0A0A" stroke-width="1.5"/>`;
+  const dots = pts.map(p => `<circle class="trend-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.v > 0 ? 3.5 : 2}"><title>${p.v} mention${p.v !== 1 ? 's' : ''}</title></circle>`).join('');
+  svg.innerHTML = grid + `<path class="trend-area" d="${areaPath}"/>` + `<path class="trend-line" d="${linePath}"/>` + dots;
+}
+
+// --- Share of voice donut ---
+function renderSOVDonut(selectedBrand) {
+  const svg = $('brandSOVSvg');
+  const cx = 60, cy = 60, r = 42;
+  const C = 2 * Math.PI * r;
+  let cumulative = 0;
+  // selected = orange; others = greyscale tones for restraint
+  const greyTones = ['#0A0A0A', '#2E2E2E', '#555555', '#8A8A8A', '#B8B8B8', '#D5D5D5', '#E5E5E5'];
+  let greyIdx = 0;
+  let segs = '';
+  ALL_BRAND_SOV.forEach(([brand, sov]) => {
+    const len = (sov / 100) * C;
+    const offset = -cumulative;
+    const isSelected = brand === selectedBrand;
+    const color = isSelected ? '#FF4500' : greyTones[greyIdx++ % greyTones.length];
+    segs += `<circle class="donut-seg" cx="${cx}" cy="${cy}" r="${r}" stroke="${color}" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"><title>${brand}: ${sov}%</title></circle>`;
+    cumulative += len;
+  });
+  const selectedSOV = ALL_BRAND_SOV.find(b => b[0] === selectedBrand);
+  const sov = selectedSOV ? selectedSOV[1] : 0;
+  svg.innerHTML = `<circle class="donut-bg" cx="${cx}" cy="${cy}" r="${r}"/>` + segs +
+    `<text class="donut-label" x="${cx}" y="${cy + 6}" text-anchor="middle">${sov}%</text>` +
+    `<text class="donut-sub" x="${cx}" y="${cy + 20}" text-anchor="middle">SHARE</text>`;
+
+  // legend
+  let lgIdx = 0;
+  $('brandSOVLegend').innerHTML = ALL_BRAND_SOV.map(([brand, sov]) => {
+    const isSel = brand === selectedBrand;
+    const color = isSel ? '#FF4500' : greyTones[lgIdx++ % greyTones.length];
+    return `<div style="display: grid; grid-template-columns: 14px 1fr auto; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--grey-6); ${isSel ? '' : 'opacity: 0.6;'}">
+      <span style="width: 12px; height: 12px; background: ${color};"></span>
+      <span style="text-transform: capitalize; font-weight: ${isSel ? '800' : '500'}; color: var(--black);">${brand}</span>
+      <span style="font-feature-settings: 'tnum'; font-weight: 700; color: ${isSel ? 'var(--orange)' : 'var(--black)'}; font-size: ${isSel ? '15px' : '13px'};">${sov}%</span>
+    </div>`;
+  }).join('');
+}
+
+// --- Brand sentiment bar + pull quote ---
+function renderBrandSentiment(b) {
+  const s = b.sentiment;
+  const total = s.pos + s.neu + s.neg || 1;
+  const segs = [];
+  if (s.pos) segs.push(`<div class="seg pos" style="flex: ${s.pos};">${Math.round(s.pos/total*100)}%</div>`);
+  if (s.neu) segs.push(`<div class="seg neu" style="flex: ${s.neu};">${Math.round(s.neu/total*100)}%</div>`);
+  if (s.neg) segs.push(`<div class="seg neg" style="flex: ${s.neg};">${Math.round(s.neg/total*100)}%</div>`);
+  $('brandSentBar').innerHTML = segs.join('');
+  $('brandSentLegend').innerHTML = `
+    <span class="sent-legend-item"><span class="sent-legend-dot" style="background:var(--pos)"></span>${s.pos} positive</span>
+    <span class="sent-legend-item"><span class="sent-legend-dot" style="background:var(--neu)"></span>${s.neu} neutral</span>
+    <span class="sent-legend-item"><span class="sent-legend-dot" style="background:var(--neg)"></span>${s.neg} negative</span>`;
+  const q = b.pullquote;
+  const sentPillClass = q.sent === 'positive' ? 'pos' : (q.sent === 'negative' ? 'neg' : '');
+  $('brandPullQuote').innerHTML = `
+    <div class="pull-quote">
+      <div class="pq-body">"${q.text}"</div>
+      <div class="pq-attrib">— <span class="handle">${q.author}</span> · ${q.video} <span class="pill ${sentPillClass}">${q.sent}</span></div>
+    </div>`;
+}
+
+// --- Brand commenters list ---
+function renderBrandCommenters(b) {
+  $('brandCommenters').innerHTML = b.topCommenters.map(c => `
+    <div class="commenter-row">
+      <div class="commenter-meta">
+        <span class="commenter-handle">${c.handle}</span>
+        <span>${c.comments} comment${c.comments !== 1 ? 's' : ''} · ${c.likes} like${c.likes !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="commenter-text">"${c.sample}"</div>
+    </div>`).join('');
+}
+
+// --- Brand co-mentions list ---
+function renderBrandCoBrands(b) {
+  if (!b.coBrands.length) { $('brandCoBrands').innerHTML = '<div style="font-size:12px;color:var(--grey-3);font-style:italic;">No co-mentions in window.</div>'; return; }
+  $('brandCoBrands').innerHTML = b.coBrands.map(([name, n]) => `
+    <div class="cobrand-row">
+      <span class="cobrand-name">${name}</span>
+      <span class="cobrand-count">${n}</span>
+    </div>`).join('');
+}
+
+// --- Brand ICP cross-reference cards ---
+function renderBrandCrossref(b) {
+  const totalOverlap = ICP_KEYS.reduce((s, k) => s + b.icpOverlap[k], 0) || 1;
+  $('brandCrossref').innerHTML = ICP_KEYS.map(k => {
+    const count = b.icpOverlap[k];
+    const pct = Math.round(count / totalOverlap * 100);
+    return `<div class="crossref-cell" onclick="gotoView('icps')">
+      <div class="name">${ICP_LABELS[k]}</div>
+      <div class="count">${count}</div>
+      <div class="pct"><strong>${pct}%</strong> of cluster mentions</div>
+      <div class="hint">↗ See ICP profile</div>
+    </div>`;
+  }).join('');
+}
+
+// --- Brand future demographic lists ---
+function renderListRows(containerId, data) {
+  $(containerId).innerHTML = data.map(([label, val]) =>
+    `<div class="demo-row"><span class="label">${label}</span><span class="val">${val}%</span></div>`
+  ).join('');
+}
+
+// --- Brand competitive context strip (from refreshable competitive intel) ---
+function renderBrandCompetitiveStrip() {
+  const ctx = BRAND_COMPETITIVE_CONTEXT[currentBrand];
+  const el = $('brandCompetitiveStrip');
+  if (!ctx) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="competitive-strip">
+      <span class="competitive-strip-tag">Competitive frame</span>
+      <span class="competitive-strip-body">${ctx.body}</span>
+      <span class="competitive-strip-link" onclick="gotoView('competitive')">See full analysis →</span>
+    </div>`;
+}
+
+// --- Render the entire Brand view ---
+function renderBrandView() {
+  const b = BRAND_DATA[currentBrand];
+  animateNum($('brandMentions'), b.mentions);
+  animateNum($('brandAuthors'), b.authors);
+  animateNum($('brandVideos'), b.videos);
+  animateNum($('brandSOV'), b.sov, '%');
+  $('brandXName').textContent = b.label;
+  $('brandTrendName').textContent = b.label;
+  $('brandSentName').textContent = b.label;
+  $('brandCmtName').textContent = b.label;
+  $('brandFutName').textContent = b.label;
+  renderBrandTrend(b.trend);
+  renderSOVDonut(currentBrand);
+  renderBrandSentiment(b);
+  renderBrandCommenters(b);
+  renderBrandCoBrands(b);
+  renderBrandCrossref(b);
+  renderBrandCompetitiveStrip();
+  renderListRows('brandFutAge', FUT_AGE);
+  renderListRows('brandFutGeo', FUT_GEO);
+  renderListRows('brandFutLife', FUT_LIFE);
+}
+
+// ============================================================
+// AUDIENCE VIEW
+// ============================================================
+function renderBehaviorRadar() {
+  // 4-axis radar at center (190, 145), radii at 100, 75, 50, 25.
+  // axes: top (racing-context 54%), right (analytical 23%), bottom (purchase-signal 17%), left (reactive 12%)
+  const cx = 190, cy = 150;
+  const R = 100;
+  const svg = $('behaviorRadar');
+  // grid polygons (4 levels)
+  let grid = '';
+  for (let lvl = 4; lvl >= 1; lvl--) {
+    const r = (R * lvl) / 4;
+    grid += `<polygon class="radar-grid" points="${cx},${cy-r} ${cx+r},${cy} ${cx},${cy+r} ${cx-r},${cy}"/>`;
+  }
+  grid += `<line class="radar-axis" x1="${cx}" y1="${cy-R}" x2="${cx}" y2="${cy+R}"/>`;
+  grid += `<line class="radar-axis" x1="${cx-R}" y1="${cy}" x2="${cx+R}" y2="${cy}"/>`;
+
+  const values = BEHAVIORS.map(b => b.value); // [54, 23, 17, 12]
+  // each axis: convert pct to distance from center (max R when pct=100; for our scale, R = 100 -> 100%)
+  const tY = cy - (R * values[0] / 100);
+  const rX = cx + (R * values[1] / 100);
+  const bY = cy + (R * values[2] / 100);
+  const lX = cx - (R * values[3] / 100);
+
+  const poly = `<polygon class="radar-poly" points="${cx},${tY} ${rX},${cy} ${cx},${bY} ${lX},${cy}"/>`;
+  const dots =
+    `<circle class="radar-dot" cx="${cx}" cy="${tY}" r="5"/>` +
+    `<circle class="radar-dot" cx="${rX}" cy="${cy}" r="5"/>` +
+    `<circle class="radar-dot" cx="${cx}" cy="${bY}" r="5"/>` +
+    `<circle class="radar-dot" cx="${lX}" cy="${cy}" r="5"/>`;
+  // labels
+  const labels =
+    `<text class="radar-label-axis" x="${cx}" y="${cy-R-20}" text-anchor="middle">RACING CONTEXT</text>` +
+    `<text class="radar-label-val"  x="${cx}" y="${cy-R-4}" text-anchor="middle">54%</text>` +
+    `<text class="radar-label-axis" x="${cx+R+8}" y="${cy+3}" text-anchor="start">ANALYTICAL</text>` +
+    `<text class="radar-label-val"  x="${cx+R+8}" y="${cy+20}" text-anchor="start">23%</text>` +
+    `<text class="radar-label-axis" x="${cx}" y="${cy+R+18}" text-anchor="middle">PURCHASE SIGNAL</text>` +
+    `<text class="radar-label-val"  x="${cx}" y="${cy+R+36}" text-anchor="middle">17%</text>` +
+    `<text class="radar-label-axis" x="${cx-R-8}" y="${cy+3}" text-anchor="end">REACTIVE</text>` +
+    `<text class="radar-label-val"  x="${cx-R-8}" y="${cy+20}" text-anchor="end">12%</text>`;
+
+  svg.innerHTML = grid + poly + dots + labels;
+}
+
+function renderPassionBubbles() {
+  const svg = $('passionBubbles');
+  // viewBox is 0 0 500 290
+  // bubbles colored: NASCAR orange, IMSA black, American orange-soft, European grey
+  const sizeScale = 1.6; // r per commenter
+  const colors = {
+    orange: { fill: '#FF4500', stroke: '#FF4500', textFill: '#0A0A0A', textStroke: 'none' },
+    black: { fill: '#0A0A0A', stroke: '#0A0A0A', textFill: '#FFFFFF', textStroke: 'none' },
+    'orange-soft': { fill: '#FFE5DC', stroke: '#FF4500', textFill: '#0A0A0A', textStroke: 'none' },
+    grey: { fill: '#E5E5E5', stroke: '#555555', textFill: '#0A0A0A', textStroke: 'none' },
+  };
+  const bubbleSVG = PASSION_POOLS.map(p => {
+    const cx = 50 + p.x * 400;
+    const cy = 30 + p.y * 230;
+    const r = Math.sqrt(p.size) * 12;
+    const c = colors[p.color];
+    const labelColor = p.color === 'black' ? '#FFFFFF' : '#0A0A0A';
+    const numColor = p.color === 'black' ? '#FF4500' : '#FF4500';
+    const lines = p.name.split(' / ');
+    const labelLines = p.name.includes('/') ? p.name.split(' / ') : (p.name.length > 14 ? p.name.split(' ') : [p.name]);
+    // smarter line break: split into 2 lines if name has more than 1 word and is long-ish
+    let l1, l2;
+    if (p.name === 'NASCAR series fans') { l1 = 'NASCAR fans'; l2 = ''; }
+    else if (p.name === 'IMSA / sports car fans') { l1 = 'IMSA fans'; l2 = ''; }
+    else if (p.name === 'American loyalists') { l1 = 'American'; l2 = 'loyalists'; }
+    else if (p.name === 'European purists') { l1 = 'European'; l2 = 'purists'; }
+    else { l1 = p.name; l2 = ''; }
+    const labelY = l2 ? cy - 8 : cy - 6;
+    return `
+      <g class="bubble-group" data-icp="${p.name}" style="cursor: pointer;">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${c.fill}" fill-opacity="${p.color === 'black' ? 0.92 : 0.35}" stroke="${c.stroke}" stroke-width="2"/>
+        <text x="${cx}" y="${labelY}" text-anchor="middle" font-family="Inter" font-size="13" font-weight="800" fill="${labelColor}">${l1}</text>
+        ${l2 ? `<text x="${cx}" y="${cy + 8}" text-anchor="middle" font-family="Inter" font-size="13" font-weight="800" fill="${labelColor}">${l2}</text>` : ''}
+        <text x="${cx}" y="${cy + (l2 ? 26 : 14)}" text-anchor="middle" font-family="Inter" font-size="13" font-weight="700" fill="${numColor}" letter-spacing="-0.02em">n=${p.size}</text>
+      </g>`;
+  }).join('');
+  svg.innerHTML = bubbleSVG;
+  svg.querySelectorAll('.bubble-group').forEach(g => {
+    g.addEventListener('click', () => gotoView('icps'));
+  });
+}
+
+function renderAudienceView() {
+  renderBehaviorRadar();
+  renderPassionBubbles();
+  renderListRows('audAge', FUT_AGE);
+  renderListRows('audGeo', FUT_GEO);
+  renderListRows('audLife', FUT_LIFE);
+}
+
+// ============================================================
+// ICPS VIEW
+// ============================================================
+function renderICPs() {
+  $('icpGrid').innerHTML = ICP_PROFILES.map(icp => {
+    const total = icp.sentiment.pos + icp.sentiment.neu + icp.sentiment.neg || 1;
+    const sentSegs = [];
+    if (icp.sentiment.pos) sentSegs.push(`<div class="icp-sent-seg pos" style="flex: ${icp.sentiment.pos};">${Math.round(icp.sentiment.pos/total*100)}%</div>`);
+    if (icp.sentiment.neu) sentSegs.push(`<div class="icp-sent-seg neu" style="flex: ${icp.sentiment.neu};">${Math.round(icp.sentiment.neu/total*100)}%</div>`);
+    if (icp.sentiment.neg) sentSegs.push(`<div class="icp-sent-seg neg" style="flex: ${icp.sentiment.neg};">${Math.round(icp.sentiment.neg/total*100)}%</div>`);
+
+    const bhTotal = icp.behaviors.context + icp.behaviors.analytical + icp.behaviors.purchase + icp.behaviors.reactive;
+
+    return `
+      <div class="icp-card ${icp.key}">
+        <div class="icp-head">
+          <div>
+            <div class="icp-title">${icp.name}</div>
+            <div class="icp-tagline">${icp.tagline}</div>
+          </div>
+          <div class="icp-size-pill">
+            <div class="icp-size-num">${icp.size}</div>
+            <div class="icp-size-label">Commenters</div>
+          </div>
+        </div>
+        <div class="icp-body">
+
+          <div class="icp-field">
+            <div class="icp-field-label">Sentiment</div>
+            <div class="icp-sentiment-bar">${sentSegs.join('')}</div>
+          </div>
+
+          <div class="icp-field">
+            <div class="icp-field-label">Behavior mix (real)</div>
+            <div class="behavior-bar">
+              <div class="bb-seg bb-context"    style="flex: ${icp.behaviors.context};"></div>
+              <div class="bb-seg bb-analytical" style="flex: ${icp.behaviors.analytical};"></div>
+              <div class="bb-seg bb-purchase"   style="flex: ${icp.behaviors.purchase};"></div>
+              <div class="bb-seg bb-reactive"   style="flex: ${icp.behaviors.reactive};"></div>
+            </div>
+            <div class="behavior-legend">
+              <div class="behavior-legend-item"><span class="behavior-legend-dot" style="background:var(--black)"></span>Context ${icp.behaviors.context}%</div>
+              <div class="behavior-legend-item"><span class="behavior-legend-dot" style="background:var(--grey-2)"></span>Analytical ${icp.behaviors.analytical}%</div>
+              <div class="behavior-legend-item"><span class="behavior-legend-dot" style="background:var(--orange)"></span>Purchase ${icp.behaviors.purchase}%</div>
+              <div class="behavior-legend-item"><span class="behavior-legend-dot" style="background:var(--grey-4)"></span>Reactive ${icp.behaviors.reactive}%</div>
+            </div>
+          </div>
+
+          <div class="icp-field">
+            <div class="icp-field-label">↗ Sponsor channel — top brand affinity (real)</div>
+            <div class="affinity-pills">
+              ${icp.brands.map(([b, n]) => `<span class="affinity-pill">${b}<span class="n">${n}</span></span>`).join('')}
+            </div>
+            <div class="icp-field-value italic" style="margin-top: 8px;">${icp.bridge}</div>
+            ${ICP_COMPETITIVE_FRAME[icp.key] ? `
+              <div class="icp-competitive-frame">
+                <span class="icp-competitive-frame-tag">${ICP_COMPETITIVE_FRAME[icp.key].tag}</span>${ICP_COMPETITIVE_FRAME[icp.key].body}
+              </div>` : ''}
+          </div>
+
+          <div class="icp-field">
+            <div class="icp-field-label">Geographic concentration</div>
+            <div class="icp-field-value">${icp.geo}</div>
+          </div>
+
+          <div class="icp-field">
+            <div class="icp-field-label">Recommended channels</div>
+            <div class="icp-field-value">${icp.channels}</div>
+          </div>
+
+          <div class="icp-field">
+            <div class="icp-field-label">Recommended message angle</div>
+            <div class="icp-field-value">${icp.message}</div>
+          </div>
+
+          <div class="icp-field">
+            <div class="icp-field-label">Representative voice</div>
+            <div class="rep-voice-mini">
+              <div class="rep-voice-mini-handle">${icp.sampleAuthor}</div>
+              <div class="rep-voice-mini-text">"${icp.sampleComment}"</div>
+            </div>
+          </div>
+
+          <div class="phase-dual">
+            <div class="phase-now">
+              <div class="phase-marker">Now · Phase 1</div>
+              <div class="phase-text">${icp.seedNow}</div>
+            </div>
+            <div class="phase-next">
+              <div class="phase-marker">Next · Future</div>
+              <div class="phase-text">${icp.seedNext}</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ============================================================
+// CONVERSATION VIEW
+// ============================================================
+function renderSentTrajectory() {
+  const svg = $('sentTrajectory');
+  const W = 600, H = 200, PAD_T = 16, PAD_B = 18, PAD_LR = 18;
+  const max = Math.max(...SENT_DAILY.map(d => d[1] + d[2] + d[3]), 1);
+  const colW = (W - 2 * PAD_LR) / SENT_DAILY.length;
+  const gap = 3;
+  const barW = colW - gap;
+
+  let bars = '';
+  SENT_DAILY.forEach((d, i) => {
+    const [date, pos, neu, neg] = d;
+    const x = PAD_LR + i * colW + gap / 2;
+    const total = pos + neu + neg;
+    if (total === 0) return;
+    const totalH = (total / max) * (H - PAD_T - PAD_B);
+    let y = H - PAD_B - totalH;
+    if (neg) { const h = (neg / total) * totalH; bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="#DC3545"><title>${date} · ${neg} negative</title></rect>`; y += h; }
+    if (neu) { const h = (neu / total) * totalH; bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="#8A8A8A"><title>${date} · ${neu} neutral</title></rect>`; y += h; }
+    if (pos) { const h = (pos / total) * totalH; bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="#1F9D55"><title>${date} · ${pos} positive</title></rect>`; }
+  });
+  let grid = '';
+  for (let i = 1; i <= 3; i++) {
+    const y = PAD_T + (i / 4) * (H - PAD_T - PAD_B);
+    grid += `<line class="trend-grid" x1="${PAD_LR}" y1="${y}" x2="${W-PAD_LR}" y2="${y}"/>`;
+  }
+  grid += `<line x1="${PAD_LR}" y1="${H-PAD_B}" x2="${W-PAD_LR}" y2="${H-PAD_B}" stroke="#0A0A0A" stroke-width="1.5"/>`;
+  svg.innerHTML = grid + bars;
+}
+
+function renderThemeShifts() {
+  const maxDelta = Math.max(...THEME_SHIFTS.map(t => Math.abs(t.w2 - t.w1)));
+  $('themeShifts').innerHTML = THEME_SHIFTS.map(t => {
+    const delta = t.w2 - t.w1;
+    const absD = Math.abs(delta);
+    const pct = (absD / maxDelta) * 48;
+    let bar = '';
+    if (t.dir === 'up')   bar = `<div class="theme-bar up" style="width: ${pct}%;"></div>`;
+    else if (t.dir === 'down') bar = `<div class="theme-bar down" style="width: ${pct}%;"></div>`;
+    else                  bar = `<div class="theme-bar flat" style="width: 8px;"></div>`;
+    return `
+      <div class="theme-row">
+        <div class="theme-label">${t.theme}</div>
+        <div class="theme-vis"><div class="theme-vis-center"></div>${bar}</div>
+        <div class="theme-delta ${t.dir}">${delta > 0 ? '+' : ''}${delta}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderListBars(containerId, data) {
+  const max = Math.max(...data.map(d => d[1]), 1);
+  $(containerId).innerHTML = data.map(([name, n]) => {
+    const pct = (n / max) * 100;
+    return `
+      <div class="list-bar">
+        <span class="list-bar-name">${name}</span>
+        <span class="list-bar-count">${n}</span>
+        <div class="list-bar-track"><div class="list-bar-fill" style="width: ${pct.toFixed(1)}%;"></div></div>
+      </div>`;
+  }).join('');
+}
+
+function renderConversationView() {
+  renderSentTrajectory();
+  renderThemeShifts();
+  renderListBars('convPeople', CONV_PEOPLE);
+  renderListBars('convEvents', CONV_EVENTS);
+}
+
+// ============================================================
+// MARKETING VIEW
+// ============================================================
+function renderTimingCurve() {
+  const svg = $('timingCurve');
+  const W = 700, H = 220, PAD_L = 30, PAD_R = 30, PAD_T = 36, PAD_B = 36;
+  const max = Math.max(...TIMING.map(t => t.volume), 1);
+  const pts = TIMING.map((t, i) => {
+    const x = PAD_L + (i / (TIMING.length - 1)) * (W - PAD_L - PAD_R);
+    const y = H - PAD_B - (t.volume / max) * (H - PAD_T - PAD_B);
+    return { x, y, ...t };
+  });
+  const linePath = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+  const areaPath = linePath + ` L ${pts[pts.length-1].x.toFixed(1)},${H-PAD_B} L ${pts[0].x.toFixed(1)},${H-PAD_B} Z`;
+  let grid = '';
+  for (let g = 1; g <= 3; g++) {
+    const y = PAD_T + (g / 4) * (H - PAD_T - PAD_B);
+    grid += `<line class="trend-grid" x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}"/>`;
+  }
+  grid += `<line x1="${PAD_L}" y1="${H-PAD_B}" x2="${W-PAD_R}" y2="${H-PAD_B}" stroke="#0A0A0A" stroke-width="1.5"/>`;
+  const racePoint = pts.find(p => p.label === 'RACE');
+  let raceMarker = '';
+  if (racePoint) {
+    const tagX = racePoint.x, tagY = 16;
+    raceMarker = `
+      <rect x="${tagX-65}" y="${tagY-12}" width="130" height="22" fill="#FF4500"/>
+      <text class="timing-annotation" x="${tagX}" y="${tagY+3}" text-anchor="middle" fill="#FFFFFF">RACE DAY · 52</text>
+      <polygon points="${tagX-6},${tagY+10} ${tagX+6},${tagY+10} ${tagX},${tagY+16}" fill="#FF4500"/>
+      <line class="timing-peak-line" x1="${tagX}" y1="${tagY+16}" x2="${tagX}" y2="${H-PAD_B}"/>`;
+  }
+  const dots = pts.map(p => `<circle class="timing-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.label === 'RACE' ? 8 : (p.volume > 0 ? 6 : 4)}"><title>${p.day}: ${p.volume} comment${p.volume !== 1 ? 's' : ''}</title></circle>`).join('');
+  const xLabels = pts.map(p => `<text class="timing-label ${p.label === 'RACE' ? 'race' : ''}" x="${p.x.toFixed(1)}" y="${H-PAD_B+18}" text-anchor="middle">${p.label}</text>`).join('');
+  svg.innerHTML = grid + raceMarker + `<path class="timing-area" d="${areaPath}"/>` + `<path class="timing-line" d="${linePath}"/>` + dots + xLabels;
+}
+
+function renderRaceComparison() {
+  $('raceComparison').innerHTML = RACE_COMPARE.map(r => {
+    const total = r.pos + r.neu + r.neg || 1;
+    return `
+      <div class="race-mini">
+        <div class="race-mini-name">${r.name}</div>
+        <div class="race-mini-date">${r.date}</div>
+        <div class="race-mini-volume">${r.volume} <span class="race-mini-volume-sub">comments</span></div>
+        <div class="race-mini-sent">
+          <div class="sent-seg pos" style="flex: ${r.pos};"></div>
+          <div class="sent-seg neu" style="flex: ${r.neu};"></div>
+          <div class="sent-seg neg" style="flex: ${r.neg};"></div>
+        </div>
+        <div class="race-mini-meta">
+          <span>Top brand: <strong>${r.top}</strong></span>
+          <span>${Math.round(r.pos/total*100)}% pos</span>
+        </div>
+        <div style="font-size: 11px; color: var(--grey-2); margin-top: 8px; line-height: 1.5; font-weight: 500;">${r.note}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderMarketingView() {
+  renderTimingCurve();
+  renderRaceComparison();
+  renderListBars('geoBars', GEO);
+}
+
+// ============================================================
+// COMPETITIVE VIEW  (refreshable input from Andre's competitive-intel app)
+// All content below is regenerated when the source app is re-run.
+// To refresh: replace COMPETITIVE_INTEL with new app export, no other changes required.
+// ============================================================
+const COMPETITIVE_INTEL = {
+  meta: {
+    generated: 'Jul 30, 2026',
+    requestor: 'A Player',
+    appVersion: 'v1.19',
+  },
+  // Scorecard rows in rank order (highest first). Sub-scores out of 10 each.
+  scorecard: [
+    { key: 'f1', brand: 'F1 (Formula 1)', vision: 10, perception: 9, awareness: 10, price: 6, share: 10, analyst: 9, total: 54 },
+    { key: 'wec', brand: 'FIA WEC', vision: 8, perception: 8, awareness: 7, price: 7, share: 5, analyst: 7, total: 42 },
+    { key: 'nascar', brand: 'NASCAR', vision: 6, perception: 6, awareness: 9, price: 7, share: 8, analyst: 6, total: 42 },
+    { key: 'imsa', brand: 'IMSA', vision: 7, perception: 7, awareness: 5, price: 8, share: 4, analyst: 6, total: 37 },
+    { key: 'indycar', brand: 'IndyCar', vision: 5, perception: 6, awareness: 5, price: 7, share: 4, analyst: 5, total: 32 },
+  ],
+  // Positioning matrix: x = mass(0) → premium(100), y = domestic(0) → global(100)
+  positioning: [
+    { key: 'f1',      label: 'F1',      x: 90, y: 95, score: 54 },
+    { key: 'wec',     label: 'WEC',     x: 78, y: 80, score: 42 },
+    { key: 'nascar',  label: 'NASCAR',  x: 40, y: 15, score: 42 },
+    { key: 'imsa',    label: 'IMSA',    x: 62, y: 40, score: 37 },
+    { key: 'indycar', label: 'IndyCar', x: 50, y: 25, score: 32 },
+  ],
+  growthSignals: [
+    { value: '115K+', label: 'Sebring 2026 attendance', note: 'All-time record, four-day gate' },
+    { value: '+32%',  label: 'Merchandise growth',      note: 'Sebring 2026 YoY at trackside retail' },
+    { value: '+37%',  label: 'Peacock streaming reach', note: 'YoY surge · direct-to-fan growth' },
+    { value: 'NEW',   label: 'Airbnb entitlement',      note: 'LMP3 endurance series · Sebring, COTA, VIR, Road America' },
+  ],
+  vsCards: [
+    {
+      key: 'overall',
+      tag: 'Overall positioning',
+      title: "Lean into the 'bridge' identity",
+      body: "IMSA's core strategic opportunity is to lean fully into its unique <strong>'bridge' identity</strong> — the only series that connects American motorsport passion directly to Le Mans and the global endurance stage — and use this as a platform to aggressively grow international broadcast reach and brand partner quality. The biggest risk is remaining a beloved insider's series without breaking into the cultural mainstream that F1 has cracked; the Airbnb partnership and Peacock growth are encouraging early signals, but IMSA needs a 'Drive to Survive' equivalent of its own.",
+    },
+    {
+      key: 'wec',
+      tag: 'vs. WEC',
+      title: 'Deepen the ACO partnership as pathway, not rivalry',
+      body: "WEC's FIAWEC+ streaming launch and 14-manufacturer grid are direct threats to IMSA's identity as the 'premier' endurance platform in North America. Deepen the ACO partnership to create a formalized <strong>'IMSA–Le Mans Pathway'</strong> brand campaign — explicitly marketing that IMSA is the gateway to Le Mans, not a rival. Co-promote Lone Star Le Mans (COTA) and lock in manufacturers considering WEC budget cuts with cost-efficient GTP entry structures.",
+    },
+    {
+      key: 'f1',
+      tag: 'vs. F1',
+      title: "Counter-position against F1's exclusion",
+      body: "F1's premium pricing and exclusionary ticket costs are its biggest consumer vulnerability — and IMSA's greatest opportunity. Build a <strong>'sport car racing for the real fan'</strong> counter-positioning campaign that emphasizes paddock access, multi-class drama, and endurance intimacy vs. F1's velvet-rope spectacle. Pursue a Peacock documentary series modeled on Drive to Survive, focused on Porsche-Cadillac-Ferrari-BMW manufacturer rivalries as character arcs.",
+    },
+    {
+      key: 'indycar',
+      tag: 'vs. IndyCar',
+      title: "Steal manufacturer investment from IndyCar's ambiguity",
+      body: "IndyCar's strategic ambiguity — caught between premium and mass-market — leaves an opening. Target automotive and technology brands currently sponsoring IndyCar that desire greater international credibility, positioning <strong>IMSA's Le Mans pathway and 14-brand GTP grid</strong> as more globally resonant. At shared venues like Indianapolis Motor Speedway, invest in co-event weekend branding to capture IndyCar audiences.",
+    },
+    {
+      key: 'nascar',
+      tag: 'vs. NASCAR',
+      title: "Leverage the parent, avoid 'NASCAR lite'",
+      body: "As a NASCAR-owned subsidiary, IMSA's parent relationship is an asset that can be better leveraged commercially, but brand differentiation is critical to avoid being perceived as 'NASCAR lite.' Push for <strong>carved-out inventory on NBC's NASCAR broadcasts</strong> to cross-promote Rolex 24 and Sebring to NASCAR's 69% male, high-brand-loyalty audience. Given NASCAR's aging demographic challenge, IMSA's younger and more international grid serves as a recruiting funnel — making a stronger internal case for portfolio-diversification investment.",
+    },
+  ],
+  aiVisibility: [
+    { key: 'imsa',    label: 'IMSA',    mentions: 3 },
+    { key: 'wec',     label: 'WEC',     mentions: 3 },
+    { key: 'f1',      label: 'F1',      mentions: 3 },
+    { key: 'indycar', label: 'IndyCar', mentions: 3 },
+    { key: 'nascar',  label: 'NASCAR',  mentions: 3 },
+  ],
+  peerCards: [
+    {
+      key: 'f1',
+      name: 'F1 (Formula 1)',
+      score: 54,
+      positioning: "Global motorsport pinnacle and premium entertainment property. Under Liberty Media, evolved from niche racing to year-round cultural juggernaut with franchise-team economics, Las Vegas spectacles, and Hollywood films.",
+      pricing: "Premium across all streams: hosting fees $50M–$70M+ per race, Paddock Club hospitality, Apple U.S. media deal, Rolex/LEGO/Pepsi sponsorship.",
+      differentiator: "Unmatched global scale, celebrity/luxury brand association, Drive to Survive playbook, Liberty Media's $26B commercial rights valuation.",
+      strengths: ['Record $3.87B revenue 2025, +14% YoY', 'Apple U.S. deal + F1 film + Netflix', 'Dominant global brand + young fan acquisition'],
+      weaknesses: ['Middle East geopolitics cancelled 2 races in 2026', 'Rising costs alienating core fans', '2026 regulation reset creates uncertainty'],
+    },
+    {
+      key: 'wec',
+      name: 'FIA World Endurance Championship',
+      score: 42,
+      positioning: "International pinnacle of long-distance sportscar racing. Le Mans as crown jewel, record 14-manufacturer grid in 2026 attracting premium automotive brands seeking road-relevance and technology validation.",
+      pricing: "Manufacturer-entry-fee and broadcasting-rights model with premium luxury sponsorships (Rolex, TotalEnergies). Ticket and hospitality premium, especially at Le Mans.",
+      differentiator: "Anchored by 24 Hours of Le Mans — world's most iconic endurance race — and global eight-round calendar with Hypercar regs extended to 2032.",
+      strengths: ['Le Mans brand equity + 100-year heritage', 'Record 14-manufacturer grid, multi-continent', 'Hypercar regs locked to 2032 = manufacturer certainty'],
+      weaknesses: ['$450M+ budget escalation risks smaller manufacturers', 'Limited North American terrestrial reach', 'Commercial scale significantly smaller than F1'],
+    },
+    {
+      key: 'nascar',
+      name: 'NASCAR',
+      score: 42,
+      positioning: "America's dominant stock car racing institution. $7.7B broadcast deal (2025–2031) across Fox/NBC/Amazon/TNT-Max, revived 'Chase' championship format. Owns 11 tracks, unmatched heartland brand equity, Fortune 500 sponsor penetration.",
+      pricing: "$7.7B multi-platform broadcast averaging $1.1B/year. Sponsorship revenue ~$362M (2024). Privately held — France family retains 100%.",
+      differentiator: "Largest U.S. motorsport by broadcast reach and sponsor penetration. 11 owned racetracks and a $7.7B broadcast deal that no domestic rival can match.",
+      strengths: ['$7.7B media rights deal 2025–2031', 'France family 100% private ownership', '1 in 4 Fortune 500 sponsors NASCAR'],
+      weaknesses: ['Sliding viewership + aging demo pre-Chase reboot', 'Antitrust lawsuit + team governance tensions', 'Teams lose ~$2.2M per car with charter payouts'],
+    },
+    {
+      key: 'indycar',
+      name: 'IndyCar',
+      score: 32,
+      positioning: "North America's premier open-wheel series. Emphasizes unpredictable racing, oval-and-road-course versatility, Indianapolis 500 as marquee. Attempting mass-market pivot via Fox Sports deal and driver-personality marketing; strategy unresolved.",
+      pricing: "Mid-tier — tickets/sponsorships more accessible than F1. Fox deal (~$25M+/yr) is step toward premium broadcast monetization.",
+      differentiator: "Indianapolis 500 — largest single-day sporting event by attendance — and format mix of oval superspeedways, road courses, and street circuits.",
+      strengths: ['Indy 500 cultural icon + 7.05M viewers (17-yr high)', 'New Fox 100% network TV coverage', 'IR-28 next-gen car creates forward momentum'],
+      weaknesses: ['No clear premium vs. mass-market commitment', 'Charter valuations (~$1M) far below NASCAR', 'Palou dominance undermines parity marketing'],
+    },
+  ],
+};
+
+// Inline hook: Brand → competitive context (only when meaningful)
+const BRAND_COMPETITIVE_CONTEXT = {
+  chevrolet: {
+    body: "Chevrolet's biggest motorsport check goes to NASCAR (~$362M category spend). IMSA's differentiation for Chevrolet is <strong>the GTP program's international storyline</strong> — Corvette C8.R and Cadillac V-Series.R reach the ACO/Le Mans audience NASCAR can't.",
+  },
+  ford: {
+    body: "Ford Mustang GTD is the manufacturer's new customer-racing entry — an <strong>IMSA-native program with no NASCAR equivalent</strong>. IMSA is where Ford's road-relevant motorsport story lives.",
+  },
+  porsche: {
+    body: "Porsche is deep in WEC + Le Mans. IMSA's opportunity is positioning as the <strong>North American gateway</strong> to Porsche's global endurance story — Rolex 24 as complementary marquee, not competitor.",
+  },
+  bmw: {
+    body: "BMW M4 GT3 anchors a customer-racing program that runs both WEC and IMSA. Emphasis for BMW conversations: <strong>IMSA delivers the domestic broadcast reach WEC lacks</strong> in North America.",
+  },
+  cadillac: {
+    body: "Cadillac's GTP entry has no NASCAR equivalent — pure IMSA-and-WEC story. Positioning: <strong>IMSA is the domestic anchor</strong> for the V-Series.R narrative that runs through Le Mans.",
+  },
+  ferrari: {
+    body: "Ferrari's 296 GT3 customer program is <strong>global by nature</strong> — WEC-first with IMSA as the North American surface. Pitch: IMSA is where Ferrari reaches U.S. affluent enthusiasts without F1 gatekeeping.",
+  },
+  acura: null,  // Acura is exiting GTP — no clean competitive angle
+  lexus: null,  // Volume too small for a specific pitch
+};
+
+// Inline hook: ICP → competitive frame (one per cluster)
+const ICP_COMPETITIVE_FRAME = {
+  'nascar': {
+    tag: 'Crossover',
+    body: "Overlap with <strong>NASCAR's $7.7B broadcast audience</strong> — a recruitment funnel opportunity NASCAR itself struggles to reach with younger and international storylines.",
+  },
+  'imsa-fans': {
+    tag: 'Native',
+    body: "The <strong>WEC-adjacent core</strong>. Analytical, Hypercar-era engaged. Doubles as the audience most likely to convert on any IMSA–Le Mans pathway messaging.",
+  },
+  'american': {
+    tag: 'NASCAR-adjacent',
+    body: "Highest manufacturer-loyalty density in the data. IMSA can offer this cluster <strong>the international story NASCAR can't</strong> — Corvette / Mustang at Le Mans.",
+  },
+  'european': {
+    tag: 'WEC-parallel',
+    body: "F1 and WEC viewer overlap. IMSA's angle: <strong>the domestic depth WEC lacks in North America</strong> — Porsche/BMW customer racing stories on U.S. iconic circuits.",
+  },
+};
+
+// ---- Competitive view renderers ----
+function renderCiHero() {
+  const imsa = COMPETITIVE_INTEL.scorecard.find(r => r.key === 'imsa');
+  const rank = COMPETITIVE_INTEL.scorecard.findIndex(r => r.key === 'imsa') + 1;
+  const subs = [
+    { label: 'Price to Value', value: imsa.price },
+    { label: 'Vision', value: imsa.vision },
+    { label: 'Consumer Perception', value: imsa.perception },
+    { label: 'Analyst Outlook', value: imsa.analyst },
+    { label: 'Market Awareness', value: imsa.awareness },
+    { label: 'Market Share', value: imsa.share },
+  ];
+  const strong = subs.reduce((a, b) => b.value > a.value ? b : a);
+  const weak = subs.reduce((a, b) => b.value < a.value ? b : a);
+  animateNum($('ciImsaScore'), imsa.total);
+  $('ciImsaRank').textContent = rank;
+  $('ciImsaStrong').textContent = strong.value + '/10';
+  $('ciImsaStrongLabel').textContent = strong.label;
+  $('ciImsaWeak').textContent = weak.value + '/10';
+  $('ciImsaWeakLabel').textContent = weak.label;
+  $('ciGenDate').textContent = COMPETITIVE_INTEL.meta.generated;
+  $('ciRequestor').textContent = COMPETITIVE_INTEL.meta.requestor;
+}
+
+function renderCiScoreTable() {
+  const cols = [
+    { key: 'brand',       label: 'Brand',       type: 'brand-name' },
+    { key: 'vision',      label: 'Vision',      type: 'sub' },
+    { key: 'perception',  label: 'Perception',  type: 'sub' },
+    { key: 'awareness',   label: 'Awareness',   type: 'sub' },
+    { key: 'price',       label: 'Price/Value', type: 'sub' },
+    { key: 'share',       label: 'Mkt Share',   type: 'sub' },
+    { key: 'analyst',     label: 'Analyst',     type: 'sub' },
+    { key: 'total',       label: 'Total /60',   type: 'total' },
+  ];
+  let html = cols.map(c => `<div class="score-cell header">${c.label}</div>`).join('');
+  COMPETITIVE_INTEL.scorecard.forEach(row => {
+    const imsaClass = row.key === 'imsa' ? ' imsa' : '';
+    cols.forEach(c => {
+      if (c.type === 'brand-name') {
+        html += `<div class="score-cell brand-name${imsaClass}">${row.brand}</div>`;
+      } else if (c.type === 'sub') {
+        const val = row[c.key];
+        const pct = (val / 10) * 100;
+        html += `<div class="score-cell sub${imsaClass}">${val}<span class="score-bar"><span class="score-bar-fill" style="width:${pct}%"></span></span></div>`;
+      } else {
+        html += `<div class="score-cell total${imsaClass}">${row.total}</div>`;
+      }
+    });
+  });
+  $('ciScoreTable').innerHTML = html;
+}
+
+function renderCiPositioningMatrix() {
+  const svg = $('ciPositioningMatrix');
+  const W = 700, H = 380, PAD_L = 80, PAD_R = 30, PAD_T = 30, PAD_B = 50;
+  const xToPx = x => PAD_L + (x / 100) * (W - PAD_L - PAD_R);
+  const yToPx = y => H - PAD_B - (y / 100) * (H - PAD_T - PAD_B);
+
+  // Quadrant fills (very subtle) — top-right is Premium/Global (F1 zone), highlighted
+  const midX = xToPx(50), midY = yToPx(50);
+  let bg = `
+    <rect x="${PAD_L}" y="${PAD_T}" width="${midX - PAD_L}" height="${midY - PAD_T}" fill="#F2F2F2" fill-opacity="0.4"/>
+    <rect x="${midX}" y="${PAD_T}" width="${W - PAD_R - midX}" height="${midY - PAD_T}" fill="#FFE5DC" fill-opacity="0.3"/>
+    <rect x="${PAD_L}" y="${midY}" width="${midX - PAD_L}" height="${H - PAD_B - midY}" fill="#F2F2F2" fill-opacity="0.6"/>
+    <rect x="${midX}" y="${midY}" width="${W - PAD_R - midX}" height="${H - PAD_B - midY}" fill="#F2F2F2" fill-opacity="0.4"/>
+  `;
+  // Axes
+  let axes = `
+    <line x1="${PAD_L}" y1="${H-PAD_B}" x2="${W-PAD_R}" y2="${H-PAD_B}" stroke="#0A0A0A" stroke-width="1.5"/>
+    <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${H-PAD_B}" stroke="#0A0A0A" stroke-width="1.5"/>
+    <line x1="${midX}" y1="${PAD_T}" x2="${midX}" y2="${H-PAD_B}" stroke="#0A0A0A" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.35"/>
+    <line x1="${PAD_L}" y1="${midY}" x2="${W-PAD_R}" y2="${midY}" stroke="#0A0A0A" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.35"/>
+  `;
+  // Axis labels
+  let labels = `
+    <text x="${(PAD_L + W - PAD_R) / 2}" y="${H - 14}" text-anchor="middle" font-family="Inter" font-size="11" font-weight="800" letter-spacing="0.14em" fill="#0A0A0A">PRICING / PRESTIGE →</text>
+    <text x="${PAD_L - 6}" y="${(PAD_T + H - PAD_B) / 2}" text-anchor="middle" font-family="Inter" font-size="11" font-weight="800" letter-spacing="0.14em" fill="#0A0A0A" transform="rotate(-90 ${PAD_L - 6} ${(PAD_T + H - PAD_B) / 2})">← DOMESTIC · GLOBAL REACH →</text>
+    <text x="${PAD_L + 8}" y="${PAD_T + 18}" text-anchor="start" font-family="Inter" font-size="9" font-weight="700" letter-spacing="0.10em" fill="#8A8A8A">MASS · GLOBAL</text>
+    <text x="${W - PAD_R - 8}" y="${PAD_T + 18}" text-anchor="end" font-family="Inter" font-size="9" font-weight="700" letter-spacing="0.10em" fill="#FF4500">PREMIUM · GLOBAL</text>
+    <text x="${PAD_L + 8}" y="${H - PAD_B - 8}" text-anchor="start" font-family="Inter" font-size="9" font-weight="700" letter-spacing="0.10em" fill="#8A8A8A">MASS · DOMESTIC</text>
+    <text x="${W - PAD_R - 8}" y="${H - PAD_B - 8}" text-anchor="end" font-family="Inter" font-size="9" font-weight="700" letter-spacing="0.10em" fill="#8A8A8A">PREMIUM · DOMESTIC</text>
+  `;
+  // Bubbles
+  let bubbles = '';
+  COMPETITIVE_INTEL.positioning.forEach(p => {
+    const cx = xToPx(p.x), cy = yToPx(p.y);
+    const r = 12 + (p.score / 60) * 20;
+    const isImsa = p.key === 'imsa';
+    const fill = isImsa ? '#FF4500' : '#0A0A0A';
+    const opacity = isImsa ? 0.85 : 0.75;
+    bubbles += `
+      <circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="${fill}" fill-opacity="${opacity}" stroke="${fill}" stroke-width="2"/>
+      <text x="${cx}" y="${(cy + 4).toFixed(1)}" text-anchor="middle" font-family="Inter" font-size="12" font-weight="800" fill="#FFFFFF" letter-spacing="-0.01em">${p.label}</text>
+      <text x="${cx}" y="${(cy + r + 14).toFixed(1)}" text-anchor="middle" font-family="Inter" font-size="10" font-weight="700" fill="${isImsa ? '#FF4500' : '#8A8A8A'}" letter-spacing="-0.01em">${p.score}/60</text>
+    `;
+  });
+  svg.innerHTML = bg + axes + labels + bubbles;
+}
+
+function renderCiGrowthSignals() {
+  $('ciGrowthSignals').innerHTML = COMPETITIVE_INTEL.growthSignals.map(g => `
+    <div class="growth-signal">
+      <div>
+        <div class="growth-signal-label">${g.label}</div>
+        <div class="growth-signal-value">${g.value}</div>
+      </div>
+      <div class="growth-signal-note">${g.note}</div>
+    </div>`).join('');
+}
+
+function renderCiVsCards() {
+  $('ciVsCards').innerHTML = COMPETITIVE_INTEL.vsCards.map(v => `
+    <div class="vs-card ${v.key === 'overall' ? 'overall' : ''}">
+      <span class="vs-card-tag">${v.tag}</span>
+      <div>
+        <span class="vs-card-title">${v.title}</span>
+        <div class="vs-card-body">${v.body}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderCiAiVisibility() {
+  $('ciAiVisibility').innerHTML = COMPETITIVE_INTEL.aiVisibility.map(a => `
+    <div class="ai-vis-cell ${a.key === 'imsa' ? 'imsa' : ''}">
+      <div class="ai-vis-brand">${a.label}</div>
+      <div class="ai-vis-count">${a.mentions}</div>
+      <div class="ai-vis-label">mentions</div>
+    </div>`).join('');
+}
+
+function renderCiPeerCards() {
+  $('ciPeerCards').innerHTML = COMPETITIVE_INTEL.peerCards.map(p => `
+    <div class="peer-card">
+      <div class="peer-card-head">
+        <div class="peer-card-name">${p.name}</div>
+        <div class="peer-card-score">${p.score}<span class="max">/60</span></div>
+      </div>
+      <div class="peer-card-body">
+        <div class="peer-field">
+          <div class="peer-field-label">Positioning</div>
+          <div class="peer-field-value">${p.positioning}</div>
+        </div>
+        <div class="peer-field">
+          <div class="peer-field-label">Pricing</div>
+          <div class="peer-field-value">${p.pricing}</div>
+        </div>
+        <div class="peer-field">
+          <div class="peer-field-label">Key differentiator</div>
+          <div class="peer-field-value">${p.differentiator}</div>
+        </div>
+        <div class="peer-swot-row">
+          <div class="peer-swot strengths">
+            <div class="peer-swot-label">Strengths</div>
+            ${p.strengths.map(s => `<div class="peer-swot-item">${s}</div>`).join('')}
+          </div>
+          <div class="peer-swot weaknesses">
+            <div class="peer-swot-label">Weaknesses</div>
+            ${p.weaknesses.map(w => `<div class="peer-swot-item">${w}</div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderCompetitiveView() {
+  renderCiHero();
+  renderCiScoreTable();
+  renderCiPositioningMatrix();
+  renderCiGrowthSignals();
+  renderCiVsCards();
+  renderCiAiVisibility();
+  renderCiPeerCards();
+}
+
+// ============================================================
+// DRIVERS VIEW (07)
+// Real mention counts from CONV_PEOPLE, enriched with driver context
+// (series, team) and inferred cluster affinity.
+// ============================================================
+const DRIVER_DATA = [
+  { name: 'Cooper Webb',        mentions: 7, series: 'Moto',    team: 'Yamaha SMX',        sent: {pos:2, neu:4, neg:1}, cluster: 'NASCAR-adjacent', clusterKey: 'american' },
+  { name: 'Chase Elliott',      mentions: 3, series: 'NASCAR',  team: 'Hendrick #9',       sent: {pos:1, neu:2, neg:0}, cluster: 'NASCAR fans',      clusterKey: 'nascar' },
+  { name: 'Laurin Heinrich',    mentions: 3, series: 'IMSA',    team: 'AO Racing GTD',     sent: {pos:2, neu:1, neg:0}, cluster: 'IMSA fans',        clusterKey: 'imsa-fans' },
+  { name: 'Ken Roczen',         mentions: 3, series: 'Moto',    team: 'Progressive HRC',   sent: {pos:1, neu:2, neg:0}, cluster: 'NASCAR-adjacent', clusterKey: 'american' },
+  { name: 'Denny Hamlin',       mentions: 2, series: 'NASCAR',  team: 'Joe Gibbs #11',     sent: {pos:0, neu:1, neg:1}, cluster: 'NASCAR fans',      clusterKey: 'nascar' },
+  { name: 'Shane van Gisbergen',mentions: 2, series: 'NASCAR',  team: 'Trackhouse #88',    sent: {pos:2, neu:0, neg:0}, cluster: 'NASCAR fans',      clusterKey: 'nascar' },
+  { name: 'Ryan Preece',        mentions: 2, series: 'NASCAR',  team: 'RFK Racing #60',    sent: {pos:0, neu:2, neg:0}, cluster: 'American loyalists',clusterKey: 'american' },
+  { name: 'Kyle Busch',         mentions: 2, series: 'NASCAR',  team: 'RCR #8',            sent: {pos:0, neu:1, neg:1}, cluster: 'American loyalists',clusterKey: 'american' },
+  { name: 'Alex Zanardi',       mentions: 1, series: 'Historic',team: 'F1/CART legacy',    sent: {pos:1, neu:0, neg:0}, cluster: 'European purists', clusterKey: 'european' },
+];
+
+// Driver × cluster affinity (illustrative; derived from cluster analysis)
+const DRIVER_CLUSTER_AFFINITY = [
+  { driver: 'Chase Elliott',        affinity: { nascar: 'hi',  'imsa-fans': 'lo', american: 'mid', european: 'lo' } },
+  { driver: 'Shane van Gisbergen',  affinity: { nascar: 'hi',  'imsa-fans': 'mid', american: 'mid', european: 'lo' } },
+  { driver: 'Laurin Heinrich',      affinity: { nascar: 'lo',  'imsa-fans': 'hi', american: 'lo', european: 'mid' } },
+  { driver: 'Kyle Busch',           affinity: { nascar: 'hi',  'imsa-fans': 'lo', american: 'hi', european: 'lo' } },
+  { driver: 'Cooper Webb',          affinity: { nascar: 'mid', 'imsa-fans': 'lo', american: 'mid', european: 'lo' } },
+  { driver: 'Alex Zanardi',         affinity: { nascar: 'lo',  'imsa-fans': 'mid', american: 'lo', european: 'hi' } },
+];
+
+// Driver → series distribution (roll-up)
+const DRIVER_SERIES_DIST = [
+  { series: 'NASCAR (Cup/Xfinity)',   count: 5, note: 'Elliott, Hamlin, SVG, Preece, Busch' },
+  { series: 'Moto (SMX/Supercross)',   count: 2, note: 'Cooper Webb, Ken Roczen — audience crossover from motocross' },
+  { series: 'IMSA (GTD/GTP)',          count: 1, note: 'Laurin Heinrich (AO Racing) — the only IMSA-native driver surfaced' },
+  { series: 'Historic / legacy',       count: 1, note: 'Alex Zanardi — heritage mention, European purist audience' },
+];
+
+// Driver endorsement candidacy — drivers with brand co-mentions
+const DRIVER_ENDORSEMENT = [
+  { driver: 'Shane van Gisbergen', brands: ['Chevrolet', 'Trackhouse'],       note: "SVG-as-Australian-NASCAR-newcomer story plays across clusters. Endorsement fit: automotive, apparel, telecom (Trackhouse partners)." },
+  { driver: 'Laurin Heinrich',      brands: ['Porsche', 'Rexy'],              note: "AO Racing GTD program driver. Endorsement fit: Porsche performance, motorsports lifestyle, technical apparel." },
+  { driver: 'Chase Elliott',        brands: ['Chevrolet', 'NAPA', 'Hendrick'],note: "NASCAR mainstream reach. Endorsement fit: American manufacturer, mass-consumer brands." },
+  { driver: 'Kyle Busch',           brands: ['Chevrolet', 'RCR'],             note: "American-loyalist cluster core. Endorsement fit: aftermarket, tools, quick-service consumer." },
+];
+
+// ---- Driver view renderers ----
+function renderDriverLeaderboard() {
+  const max = Math.max(...DRIVER_DATA.map(d => d.mentions));
+  $('driverLeaderboard').innerHTML = DRIVER_DATA.map((d, i) => {
+    const sent = d.sent;
+    const total = sent.pos + sent.neu + sent.neg || 1;
+    const clusterClass = d.clusterKey === 'imsa-fans' ? ' imsa' : '';
+    return `
+      <div class="driver-row">
+        <span class="driver-rank">${String(i+1).padStart(2, '0')}</span>
+        <div>
+          <div class="driver-name">${d.name}</div>
+          <div class="driver-meta"><span class="series-tag ${d.series === 'IMSA' ? 'imsa' : ''}">${d.series}</span> ${d.team}</div>
+        </div>
+        <div class="driver-count-wrap">
+          <div class="driver-count">${d.mentions}</div>
+          <div class="driver-count-sub">mentions</div>
+        </div>
+        <div class="driver-sent-bar">
+          ${sent.pos ? `<div class="seg pos" style="flex:${sent.pos}"></div>` : ''}
+          ${sent.neu ? `<div class="seg neu" style="flex:${sent.neu}"></div>` : ''}
+          ${sent.neg ? `<div class="seg neg" style="flex:${sent.neg}"></div>` : ''}
+        </div>
+        <div class="driver-cluster-badge${clusterClass}">${d.cluster}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderDriverClusterAffinity() {
+  const clusters = ['nascar', 'imsa-fans', 'american', 'european'];
+  const clusterLabels = { nascar: 'NASCAR', 'imsa-fans': 'IMSA', american: 'American', european: 'European' };
+  let html = '<div class="aff-cell header">Driver</div>';
+  clusters.forEach(c => html += `<div class="aff-cell header">${clusterLabels[c]}</div>`);
+  DRIVER_CLUSTER_AFFINITY.forEach(row => {
+    html += `<div class="aff-cell driver-name-cell">${row.driver}</div>`;
+    clusters.forEach(c => {
+      const val = row.affinity[c];
+      const glyph = val === 'hi' ? '●●●' : val === 'mid' ? '●●○' : '●○○';
+      html += `<div class="aff-cell affinity-value ${val}">${glyph}</div>`;
+    });
+  });
+  $('driverClusterAffinity').innerHTML = `<div class="affinity-matrix">${html}</div>`;
+}
+
+function renderDriverSeriesBreakdown() {
+  const max = Math.max(...DRIVER_SERIES_DIST.map(s => s.count));
+  $('driverSeriesBreakdown').innerHTML = DRIVER_SERIES_DIST.map(s => `
+    <div style="padding: 14px 0; border-bottom: 1px solid var(--grey-5);">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+        <span style="font-size: 13px; font-weight: 700; color: var(--black);">${s.series}</span>
+        <span style="font-size: 20px; font-weight: 800; color: var(--orange); font-feature-settings: 'tnum'; letter-spacing: -0.03em;">${s.count}</span>
+      </div>
+      <div style="height: 6px; background: var(--grey-6); border: 1px solid var(--grey-5); margin-bottom: 6px;">
+        <div style="height: 100%; background: var(--orange); width: ${(s.count/max)*100}%;"></div>
+      </div>
+      <div style="font-size: 11px; color: var(--grey-2); font-weight: 500; line-height: 1.4;">${s.note}</div>
+    </div>`).join('');
+}
+
+function renderDriverEndorsement() {
+  $('driverEndorsement').innerHTML = DRIVER_ENDORSEMENT.map(d => `
+    <div style="padding: 16px 0; border-bottom: 1px solid var(--grey-5); display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: start;">
+      <div>
+        <div style="font-size: 15px; font-weight: 800; color: var(--black); letter-spacing: -0.01em; margin-bottom: 6px;">${d.driver}</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+          ${d.brands.map(b => `<span class="affinity-pill" style="font-size: 10px; padding: 2px 8px;">${b}</span>`).join('')}
+        </div>
+      </div>
+      <div style="font-size: 12px; color: var(--black); font-weight: 500; line-height: 1.5;">${d.note}</div>
+    </div>`).join('');
+}
+
+function renderDriversView() {
+  renderDriverLeaderboard();
+  renderDriverClusterAffinity();
+  renderDriverSeriesBreakdown();
+  renderDriverEndorsement();
+}
+
+// ============================================================
+// SERIES VIEW (08)
+// Real mentions from CONV_EVENTS, IMSA-native flagged vs. crossover
+// ============================================================
+const IMSA_PROPERTIES = [
+  { name: 'IMSA WeatherTech SportsCar Championship', sub: 'The premier IMSA series · GTP + GTD/GTD-PRO', mentions: 16, note: 'Monterey + Rolex 24 references drive most of the signal.' },
+  { name: 'Michelin Pilot Challenge',                 sub: 'Two-class TCR + GS support series', mentions: 4, note: 'Underrepresented in the harvest — likely search-rule opportunity.' },
+  { name: 'VP Racing SportsCar Challenge',             sub: 'LMP3 + GT4 support series',            mentions: 2, note: 'Minimal signal — programming opportunity for content lift.' },
+];
+
+const CROSSOVER_SERIES = [
+  { name: 'NASCAR Cup Series',        sub: 'US stock car mainstream · Chevy/Ford/Toyota',         mentions: 16, note: 'Largest crossover audience. Watkins Glen weekend + Kyle Busch drive engagement.' },
+  { name: 'WEC / 24 Hours of Le Mans', sub: 'International endurance · Hypercar era + LMGT3',      mentions: 5, note: 'European purist cluster core. IMSA-Le Mans pathway conversation lives here.' },
+  { name: 'Lamborghini Super Trofeo',  sub: 'One-make series · Huracán ST EVO2',                   mentions: 4, note: 'Concentrated at Laguna Seca weekend. Enthusiast-lifestyle audience.' },
+  { name: 'IndyCar (NTT Series)',      sub: 'US open-wheel · Indy 500 marquee',                    mentions: 2, note: 'Low overlap but shared venue (Indianapolis Motor Speedway) creates activation window.' },
+  { name: 'Trans Am',                  sub: 'US GT-style historic series · TA2 headliners',        mentions: 1, note: 'Small but exists — American loyalist cluster affinity.' },
+];
+
+const SERIES_ICP_MATRIX = [
+  { series: 'IMSA WeatherTech',        'nascar': 'lo',  'imsa-fans': 'hi', 'american': 'mid', 'european': 'hi' },
+  { series: 'Michelin Pilot',          'nascar': 'lo',  'imsa-fans': 'hi', 'american': 'lo',  'european': 'mid' },
+  { series: 'NASCAR Cup',              'nascar': 'hi',  'imsa-fans': 'lo', 'american': 'hi',  'european': 'lo' },
+  { series: 'WEC / Le Mans',           'nascar': 'lo',  'imsa-fans': 'hi', 'american': 'lo',  'european': 'hi' },
+  { series: 'Lambo Super Trofeo',      'nascar': 'lo',  'imsa-fans': 'mid','american': 'lo',  'european': 'hi' },
+  { series: 'IndyCar',                 'nascar': 'mid', 'imsa-fans': 'lo', 'american': 'mid', 'european': 'lo' },
+];
+
+function renderSeriesList(containerId, data, kind) {
+  const iconLabel = kind === 'imsa' ? 'I' : 'C';
+  $(containerId).innerHTML = data.map(s => `
+    <div class="series-row">
+      <span class="series-icon ${kind === 'imsa' ? '' : 'crossover'}">${iconLabel}</span>
+      <div>
+        <div class="series-name-cell">${s.name}</div>
+        <div class="series-name-sub">${s.sub}</div>
+      </div>
+      <div class="series-mentions">${s.mentions}</div>
+      <div class="series-note">${s.note}</div>
+      <div class="series-tag ${kind === 'imsa' ? '' : 'crossover'}">${kind === 'imsa' ? 'IMSA' : 'Crossover'}</div>
+    </div>`).join('');
+}
+
+function renderSeriesIcpMatrix() {
+  const clusters = ['nascar', 'imsa-fans', 'american', 'european'];
+  const labels = { nascar: 'NASCAR', 'imsa-fans': 'IMSA', american: 'American', european: 'European' };
+  let html = '<div class="aff-cell header">Series</div>';
+  clusters.forEach(c => html += `<div class="aff-cell header">${labels[c]}</div>`);
+  SERIES_ICP_MATRIX.forEach(row => {
+    html += `<div class="aff-cell driver-name-cell">${row.series}</div>`;
+    clusters.forEach(c => {
+      const val = row[c];
+      const glyph = val === 'hi' ? '●●●' : val === 'mid' ? '●●○' : '●○○';
+      html += `<div class="aff-cell affinity-value ${val}">${glyph}</div>`;
+    });
+  });
+  $('seriesIcpMatrix').innerHTML = `<div class="affinity-matrix">${html}</div>`;
+}
+
+function renderSeriesView() {
+  renderSeriesList('seriesImsaProperties', IMSA_PROPERTIES, 'imsa');
+  renderSeriesList('seriesCrossover', CROSSOVER_SERIES, 'crossover');
+  renderSeriesIcpMatrix();
+}
+
+// ============================================================
+// GEOGRAPHY VIEW (09)
+// Real venue mentions from GEO, enriched with region + IMSA flag
+// ============================================================
+const VENUE_DATA = [
+  { name: 'Monterey / Laguna Seca',    region: 'West',      mentions: 50, imsa: true,  note: 'IMSA WeatherTech round + Lambo Super Trofeo weekend' },
+  { name: 'Watkins Glen',               region: 'Northeast', mentions: 14, imsa: false, note: 'NASCAR Cup crossover · SVG storyline' },
+  { name: 'Texas (Motor Speedway)',     region: 'South',     mentions: 8,  imsa: false, note: 'NASCAR Cup · crossover reach' },
+  { name: 'Indianapolis',               region: 'Midwest',   mentions: 5,  imsa: true,  note: 'IMSA + IndyCar shared venue · Indy 500 halo' },
+  { name: 'Daytona',                    region: 'South',     mentions: 4,  imsa: true,  note: 'Rolex 24 mentions · Class-defining IMSA venue' },
+  { name: 'Sebring',                    region: 'South',     mentions: 3,  imsa: true,  note: '12 Hours of Sebring · 115K attendance record' },
+  { name: 'Road America',               region: 'Midwest',   mentions: 2,  imsa: true,  note: 'Elkhart Lake · Midwest IMSA anchor' },
+  { name: 'COTA (Austin)',              region: 'South',     mentions: 2,  imsa: true,  note: 'Lone Star Le Mans co-event · WEC bridge venue' },
+  { name: 'Road Atlanta',               region: 'South',     mentions: 2,  imsa: true,  note: 'Petit Le Mans — IMSA season-finale marquee' },
+  { name: 'Long Beach',                 region: 'West',      mentions: 1,  imsa: false, note: 'IndyCar street race · shared urban audience' },
+  { name: 'Charlotte',                  region: 'South',     mentions: 1,  imsa: false, note: 'NASCAR Coca-Cola 600 crossover' },
+  { name: 'Nürburgring',                region: 'Intl',      mentions: 1,  imsa: false, note: 'International crossover · European purist cluster' },
+];
+
+const REGION_ROLLUP = [
+  { region: 'West',      count: 51, note: 'Dominated by Monterey/Laguna Seca race weekend' },
+  { region: 'South',     count: 20, note: 'Sebring/Daytona/COTA/Atlanta — IMSA endurance heartland' },
+  { region: 'Northeast', count: 14, note: 'Watkins Glen NASCAR crossover drives the signal' },
+  { region: 'Midwest',   count: 7,  note: 'Underrepresented — growth opportunity for Road America programming' },
+  { region: 'Intl',      count: 1,  note: 'Nürburgring reference — European purist cluster' },
+];
+
+const CLUSTER_GEO = [
+  { cluster: 'NASCAR fans',        region: 'Southeast US',        note: 'Florida, Carolinas, Texas · NASCAR heartland overlap' },
+  { cluster: 'IMSA / sports car',  region: 'California + Florida + NY metro', note: 'Concentrated near IMSA venues' },
+  { cluster: 'American loyalists', region: 'Midwest + Southeast', note: 'NASCAR territory overlap' },
+  { cluster: 'European purists',   region: 'Northeast + California', note: 'F1/WEC viewer overlap' },
+];
+
+const TRACK_SPONSOR_ANGLE = [
+  { track: 'Laguna Seca',    sub: 'Monterey · IMSA WeatherTech + Lambo Super Trofeo', brands: ['Porsche', 'BMW', 'Cadillac', 'Lamborghini'], icp: 'IMSA fans + European purists', imsa: true },
+  { track: 'Sebring',        sub: '12 Hours of Sebring · classic endurance venue',    brands: ['Cadillac', 'Porsche', 'Acura', 'BMW'],       icp: 'IMSA fans + American loyalists', imsa: true },
+  { track: 'Daytona',        sub: 'Rolex 24 marquee · IMSA + NASCAR shared',         brands: ['Chevrolet', 'Cadillac', 'Ferrari'],           icp: 'NASCAR fans + IMSA fans', imsa: true },
+  { track: 'Indianapolis',   sub: 'IMSA + IndyCar shared · Indy 500 halo',           brands: ['Chevrolet', 'Honda', 'Cadillac'],             icp: 'American loyalists', imsa: true },
+  { track: 'COTA',           sub: 'Lone Star Le Mans · WEC bridge event',            brands: ['Porsche', 'Ferrari', 'BMW', 'Cadillac'],      icp: 'European purists + IMSA fans', imsa: true },
+];
+
+function renderGeoVenueLeaderboard() {
+  const max = Math.max(...VENUE_DATA.map(v => v.mentions));
+  $('geoVenueLeaderboard').innerHTML = VENUE_DATA.map((v, i) => `
+    <div class="venue-row">
+      <span class="driver-rank">${String(i+1).padStart(2, '0')}</span>
+      <div>
+        <div class="venue-name-cell">${v.name}</div>
+        <div class="venue-name-sub">${v.note}</div>
+      </div>
+      <div>
+        <div class="venue-region">${v.region}</div>
+        <div class="venue-bar-track" style="margin-top: 6px;">
+          <div class="venue-bar-fill" style="width: ${(v.mentions/max)*100}%;"></div>
+        </div>
+      </div>
+      <div class="venue-count">${v.mentions}</div>
+      <div class="venue-imsa-flag ${v.imsa ? '' : 'notrack'}">${v.imsa ? 'IMSA' : 'Crossover'}</div>
+    </div>`).join('');
+}
+
+function renderGeoRegionBars() {
+  const max = Math.max(...REGION_ROLLUP.map(r => r.count));
+  $('geoRegionBars').innerHTML = REGION_ROLLUP.map(r => `
+    <div style="padding: 14px 0; border-bottom: 1px solid var(--grey-5);">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+        <span style="font-size: 14px; font-weight: 700; color: var(--black);">${r.region}</span>
+        <span style="font-size: 22px; font-weight: 800; color: var(--orange); font-feature-settings: 'tnum'; letter-spacing: -0.03em;">${r.count}</span>
+      </div>
+      <div style="height: 8px; background: var(--grey-6); border: 1px solid var(--grey-5); margin-bottom: 6px;">
+        <div style="height: 100%; background: var(--orange); width: ${(r.count/max)*100}%;"></div>
+      </div>
+      <div style="font-size: 11px; color: var(--grey-2); font-weight: 500;">${r.note}</div>
+    </div>`).join('');
+}
+
+function renderGeoClusterMap() {
+  $('geoClusterMap').innerHTML = CLUSTER_GEO.map(c => `
+    <div class="cluster-geo-row">
+      <div>
+        <div class="cluster-geo-name">${c.cluster}</div>
+        <div class="cluster-geo-region">${c.note}</div>
+      </div>
+      <div style="font-size: 12px; font-weight: 800; color: var(--orange); text-align: right; text-transform: uppercase; letter-spacing: 0.06em;">${c.region}</div>
+    </div>`).join('');
+}
+
+function renderGeoTrackSponsor() {
+  $('geoTrackSponsor').innerHTML = TRACK_SPONSOR_ANGLE.map(t => `
+    <div class="track-sponsor-row">
+      <div>
+        <div class="track-sponsor-track">${t.track}</div>
+        <div class="track-sponsor-track-sub">${t.sub}</div>
+      </div>
+      <div class="track-sponsor-brands">
+        ${t.brands.map(b => `<span class="affinity-pill" style="font-size: 11px;">${b}</span>`).join('')}
+      </div>
+      <div style="text-align: right;">
+        <span class="track-sponsor-icp imsa">${t.icp}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderGeographyView() {
+  renderGeoVenueLeaderboard();
+  renderGeoRegionBars();
+  renderGeoClusterMap();
+  renderGeoTrackSponsor();
+}
+
+// ============================================================
+// SPONSOR CATEGORIES VIEW (10)
+// Phase 2 shell — Auto is real (current LUX rules), others are honest placeholders
+// ============================================================
+const SPONSOR_CATEGORIES = [
+  { name: 'Auto / OEM',            active: true,  detail: 'Manufacturer + aftermarket + dealer network signal. Currently the only category with active LUX rules.',                                    example: 'Real signal: Chevrolet 17, Ford 8, Porsche 6, BMW 5, Cadillac 3 · 45 total mentions in window' },
+  { name: 'Financial services',    active: false, detail: 'Banks + fintech + credit cards. Highest sponsor-spend category for premium motorsport (Rolex/Amex/Mastercard).',                          example: 'Would catch: Chase/Amex/Rolex partner conversations, financial sponsor pitch context' },
+  { name: 'Tech + electronics',    active: false, detail: 'Consumer electronics + enterprise SaaS + platforms. Audience over-indexes analytical (23% behavior mix).',                                example: 'Would catch: Apple/Google/Meta partner discussions, tech-brand sponsor conversations' },
+  { name: 'Apparel + lifestyle',   active: false, detail: 'Performance apparel + fan merchandise + luxury lifestyle. Direct tie to +32% Sebring merch growth signal.',                              example: 'Would catch: Puma/Under Armour/PRL merch conversation, driver-suit sponsor context' },
+  { name: 'Food & beverage',       active: false, detail: 'Beer + spirits + energy drinks + QSR. Paddock hospitality lever. Historically strong in NASCAR-adjacent audiences.',                     example: 'Would catch: Red Bull/Monster/Coca-Cola/Beer brand conversations at race weekends' },
+  { name: 'Insurance',             active: false, detail: 'P&C + life + auto insurance. NASCAR heritage (Progressive/Geico) plus IMSA-native opportunity.',                                          example: 'Would catch: Progressive/Geico/State Farm partner discussions in racing context' },
+  { name: 'Healthcare',            active: false, detail: 'Pharma + medical devices + wellness. Emerging category in motorsport sponsorship. Aging NASCAR demo makes this relevant.',                example: 'Would catch: Pharma partner conversations, health/wellness brand context' },
+  { name: 'Energy',                active: false, detail: 'Oil + gas + EV charging + renewables. Direct racing-relevance (fuel partners, EV transition narrative).',                                  example: 'Would catch: Shell/Mobil/Exxon partner discussions, EV-charging conversations' },
+  { name: 'Travel + hospitality',  active: false, detail: 'Hotels + airlines + short-term rental. Direct tie to Airbnb Sebring/COTA/VIR/Road America entitlement announcement.',                      example: 'Would catch: Airbnb/Marriott/airline partner conversations at race destinations' },
+];
+
+const AUTO_SUB = [
+  { name: 'OEM (manufacturer)',           count: 43, detail: 'Chevrolet 17, Ford 8, Porsche 6, BMW 5, Cadillac 3, Ferrari 3, Acura 1' },
+  { name: 'EV / electric',                 count: 3, detail: 'Cross-cut of manufacturers · Ferrari EV launch, Cadillac electric mentions' },
+  { name: 'Aftermarket + performance',    count: 0, detail: 'Phase 2 rule expansion · custom exhaust, tuning, performance parts' },
+  { name: 'Dealer network',                count: 0, detail: 'Phase 2 rule expansion · Hendrick Automotive vs Motorsports split (from prototype v1 learnings)' },
+];
+
+function renderSponsorCategoryGrid() {
+  $('sponsorCategoryGrid').innerHTML = SPONSOR_CATEGORIES.map(c => `
+    <div class="category-card ${c.active ? 'active' : ''}">
+      <div class="category-card-status">${c.active ? 'Live' : 'Phase 2'}</div>
+      <div class="category-card-name">${c.name}</div>
+      <div class="category-card-detail">${c.detail}</div>
+      <div class="category-card-example"><strong>${c.active ? 'Live signal:' : 'Rule would catch:'}</strong> ${c.example}</div>
+    </div>`).join('');
+}
+
+function renderSponsorAutoBreakout() {
+  const max = Math.max(...AUTO_SUB.map(s => s.count), 1);
+  $('sponsorAutoBreakout').innerHTML = AUTO_SUB.map(s => {
+    const active = s.count > 0;
+    return `
+      <div class="auto-sub-row">
+        <div>
+          <div class="auto-sub-name">${s.name}</div>
+        </div>
+        <div class="auto-sub-count" style="${active ? '' : 'color: var(--grey-3);'}">${s.count}</div>
+        <div style="height: 6px; background: var(--grey-6); border: 1px solid var(--grey-5);">
+          <div style="height: 100%; background: ${active ? 'var(--orange)' : 'var(--grey-4)'}; width: ${(s.count/max)*100}%;"></div>
+        </div>
+        <div class="auto-sub-detail">${s.detail}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderSponsorsView() {
+  renderSponsorCategoryGrid();
+  renderSponsorAutoBreakout();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderBrandPicker();
+renderBrandView();
+renderAudienceView();
+renderICPs();
+renderConversationView();
+renderMarketingView();
+renderCompetitiveView();
+renderDriversView();
+renderSeriesView();
+renderGeographyView();
+renderSponsorsView();
+
+</script>
+</body>
+</html>
